@@ -1,0 +1,15 @@
+﻿#include "items.h"
+#include "surface.h"
+
+namespace Tmpl8
+{
+    static Sprite itemsSprite(new Surface("assets/items.png"), 8);
+
+    void InitItems() {}
+    void ShutdownItems() {}
+    void UpdateAndDrawItems(Surface* screen)
+    {
+        itemsSprite.SetFrame(3);
+        itemsSprite.Draw(screen, 384, 320);
+    }
+}

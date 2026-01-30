@@ -1,0 +1,288 @@
+﻿#include "game.h"
+#include "surface.h"
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+
+namespace Tmpl8
+{
+    void Game::Init() {}
+    void Game::Shutdown() {}
+
+    Surface tiles("assets/tiles.png");
+    
+    int spritesheetWidth = 261;
+    int tileSize = 64;
+    int spritesheetSpace = 1;
+    int mapHeight = 8;
+    int mapWidth = 10;
+    int characterSize = 40;
+    int level = 0;
+
+    bool holdingItem = false;
+    int itemHolding = -1;
+
+    int dA = 4;
+    int iA = 2;
+
+    int dX[4] = { tileSize * 3 - tileSize, tileSize * 5 - tileSize, tileSize * 7 - tileSize, tileSize * 5 - tileSize };
+    int dY[4] = { tileSize * 4 - tileSize, tileSize * 2 - tileSize, tileSize * 4 - tileSize, tileSize * 6 - tileSize };
+    int dF[4] = { 4, 15, 10, 25 };
+
+    int iX[2] = { tileSize * 7 - tileSize, tileSize * 7 - tileSize };
+    int iY[2] = { tileSize * 6 - tileSize, tileSize * 2 - tileSize };
+    int iF[2] = { 3, 5 };
+    bool iPU[2] = { false, false };
+    bool iU[2] = { false, false };
+
+    char map[8][40] = {
+         "aax aax aax aax aax aax aax aax aax aax",
+         "aax aax ad- bb- bb- bb- dd- aax aax aax",
+         "aax aax ab- aax aax aax ab- aax aax aax",
+         "aax aax ab- aax aax aax ab- aax aax aax",
+         "aax ad- dg- dd- aax aax ab- aax aax aax",
+         "aax bc- aa- cg- bb- bb- cd- aax aax aax",
+         "aax bd- cc- cd- aax aax aax aax aax aax",
+         "aax aax aax aax aax aax aax aax aax aax"
+    };
+
+    Sprite character(new Surface("assets/character sprites.png"), 4);
+    int px = (tileSize * 3 - tileSize) + ((tileSize - characterSize) / 2), py = (tileSize * 6 - tileSize) + ((tileSize - characterSize) / 2);
+
+    Sprite doors(new Surface("assets/doors.png"), 44);
+    Sprite items(new Surface("assets/items.png"), 8);
+
+    //overgangen
+    Sprite CtB(new Surface("assets/cube to ball.png"), 9);
+    Sprite CtT(new Surface("assets/cube to triangle.png"), 10);
+    Sprite CtS(new Surface("assets/cube to stickfigure.png"), 11);
+
+    Sprite BtC(new Surface("assets/ball to cube.png"), 9);
+    Sprite BtT(new Surface("assets/ball to triangle.png"), 7);
+    Sprite BtS(new Surface("assets/ball to stickfigure.png"), 11);
+
+    Sprite TtC(new Surface("assets/triangle to cube.png"), 10);
+    Sprite TtB(new Surface("assets/triangle to ball.png"), 7);
+    Sprite TtS(new Surface("assets/triangle to stickfigure.png"), 11);
+
+    Sprite StC(new Surface("assets/stickfigure to cube.png"), 11);
+    Sprite StB(new Surface("assets/stickfigure to ball.png"), 11);
+    Sprite StT(new Surface("assets/stickfigure to triangle.png"), 11);
+
+
+    bool CheckPos(int x, int y)
+    {
+        int tx = x / tileSize, ty = y / tileSize;
+        return map[ty][tx * 4 + 2] != 'x';
+    }
+
+    /*void createlevel()
+    {
+        if (level == 0)
+        {
+            iA = 1;
+
+        }
+
+    }*/
+
+    bool stickUnlocked = true;
+    int characterState = 0;
+
+    void DrawTile(int tx, int ty, Surface* screen, int x, int y)
+    {
+        Pixel* src = tiles.GetBuffer() + 1 + tx * (tileSize + spritesheetSpace) + (1 + ty * (tileSize + spritesheetSpace)) * spritesheetWidth;
+        Pixel* dst = screen->GetBuffer() + x + y * 800;
+        for (int i = 0; i < tileSize; i++, src += spritesheetWidth, dst += 800)
+            for (int j = 0; j < tileSize; j++)
+                dst[j] = src[j];
+    }
+
+    void checkItem(int px, int py)
+    {
+        for (int i = 0; i < iA; i++)
+        {
+            for (int j = iX[i]; j < iX[i] + tileSize; j++)
+            {
+                for (int k = iY[i]; k < iY[i] + tileSize; k++)
+                {
+                    if (j == px && k == py)
+                    {
+                        if (holdingItem == false)
+                        {
+                            iPU[i] = true;
+                            itemHolding = i;
+                            holdingItem = true;
+                            return;
+                        }
+                        else
+                        {
+                            // dropping previous item at the player's current tile
+                            int prev = itemHolding;
+                            int dropX = (px / tileSize) * tileSize;
+                            int dropY = (py / tileSize) * tileSize;
+                            iX[prev] = dropX;
+                            iY[prev] = dropY;
+                            iPU[prev] = false;
+                            iU[prev] = false; // ensure it's available/visible
+                            // picking up new item
+                            iPU[i] = true;
+                            iU[i] = false;
+                            itemHolding = i;
+                            holdingItem = true;
+                            return;
+                        }
+                    }
+                    /*else
+                    {
+                        if (holdingItem == true)
+                        {
+                            iX[itemHolding] = iX[i];
+                            iY[itemHolding] = iY[i];
+                            iPU[itemHolding] = false;
+                            holdingItem = false;
+                        }
+                    }*/
+                }
+            }
+        }
+    }
+
+    void Game::Tick(float deltaTime)
+    {
+        screen->Clear(0);
+        for (int y = 0; y < mapHeight; y++)
+            for (int x = 0; x < mapWidth; x++)
+            {
+                int tx = map[y][x * 4] - 'a';
+                int ty = map[y][x * 4 + 1] - 'a';
+                DrawTile(tx, ty, screen, x * tileSize, y * tileSize);
+            }
+
+        //doors creation
+        for (int i = 0; i < dA; i++)
+        {
+            doors.SetFrame(dF[i]);
+            doors.Draw(screen, dX[i], dY[i]);
+        }
+
+
+        character.Draw(screen, px, py);
+        int nx = px, ny = py;
+        if (GetAsyncKeyState(VK_LEFT) || GetAsyncKeyState('A')) {
+            nx--;
+            nx--;
+        }
+        if (GetAsyncKeyState(VK_RIGHT) || GetAsyncKeyState('D')) {
+            nx++;
+            nx++;
+        }
+        if (GetAsyncKeyState(VK_UP) || GetAsyncKeyState('W')) {
+            ny--;
+            ny--;
+        }
+        if (GetAsyncKeyState(VK_DOWN) || GetAsyncKeyState('S')) {
+            ny++;
+            ny++;
+        }
+        if (CheckPos(nx, ny) && CheckPos(nx + 42, ny + 42) &&
+            CheckPos(nx + 42, ny) && CheckPos(nx, ny + 42))
+            px = nx, py = ny;
+        
+
+        //doors creation
+        for (int i = 0; i < iA; i++)
+        {
+            if (iPU[i] == false && iU[i] == false)
+            {
+                items.SetFrame(iF[i]);
+                items.Draw(screen, iX[i], iY[i]);
+            }
+        }
+
+
+        if (GetAsyncKeyState('E'))
+        {
+            checkItem(px, py);
+        }
+
+
+
+        // character switching
+        if (GetAsyncKeyState('C')) {
+            if (characterState == 1) {
+                for (int i = 0; i < 9; i++) {
+                    BtC.SetFrame(0 + i);
+                }
+            }
+            if (characterState == 2) {
+                for (int i = 0; i < 10; i++) {
+                    TtC.SetFrame(0 + i);
+                }
+            }
+            if (characterState == 3) {
+                for (int i = 0; i < 11; i++) {
+                    StC.SetFrame(0 + i);
+                }
+            }
+            character.SetFrame(0);
+            characterState = 0;
+        }
+        if (GetAsyncKeyState('B')) {
+            if (characterState == 0) {
+                for (int i = 0; i < 9; i++) {
+                    CtB.SetFrame(0 + i);
+                }
+            }
+            if (characterState == 2) {
+                for (int i = 0; i < 7; i++) {
+                    TtB.SetFrame(0 + i);
+                }
+            }
+            if (characterState == 3) {
+                for (int i = 0; i < 11; i++) {
+                    StB.SetFrame(0 + i);
+                }
+            }
+            character.SetFrame(1);
+            characterState = 1;
+        }
+        if (GetAsyncKeyState('V')) {
+            if (characterState == 0) {
+                for (int i = 0; i < 10; i++) {
+                    CtT.SetFrame(0 + i);
+                }
+            }
+            if (characterState == 1) {
+                for (int i = 0; i < 7; i++) {
+                    BtT.SetFrame(0 + i);
+                }
+            }
+            if (characterState == 3) {
+                for (int i = 0; i < 11; i++) {
+                    StT.SetFrame(0 + i);
+                }
+            }
+            character.SetFrame(2);
+            characterState = 2;
+        }
+        if (GetAsyncKeyState('N') && stickUnlocked == true) {
+            if (characterState == 0) {
+                for (int i = 0; i < 11; i++) {
+                    CtS.SetFrame(0 + i);
+                }
+            }
+            if (characterState == 1) {
+                for (int i = 0; i < 11; i++) {
+                    BtS.SetFrame(0 + i);
+                }
+            }
+            if (characterState == 2) {
+                for (int i = 0; i < 11; i++) {
+                    TtS.SetFrame(0 + i);
+                }
+            }
+            character.SetFrame(3);
+            characterState = 3;
+        }
+    }
+};

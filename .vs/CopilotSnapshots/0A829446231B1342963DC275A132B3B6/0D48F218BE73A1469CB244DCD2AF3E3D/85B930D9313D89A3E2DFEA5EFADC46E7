@@ -1,0 +1,63 @@
+﻿#include "character.h"
+#include "surface.h"
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+
+namespace Tmpl8
+{
+    // character sprites and state
+    static Sprite character(new Surface("assets/character sprites.png"), 4);
+    static int px = 0, py = 0;
+    static bool stickUnlocked = true;
+    static int characterState = 0;
+
+    void InitCharacter()
+    {
+        int tileSize = 64;
+        int characterSize = 40;
+        px = (tileSize * 3 - tileSize) + ((tileSize - characterSize) / 2);
+        py = (tileSize * 6 - tileSize) + ((tileSize - characterSize) / 2);
+    }
+
+    void ShutdownCharacter() {}
+
+    void UpdateAndDrawCharacter(Surface* screen)
+    {
+        character.Draw(screen, px, py);
+        int nx = px, ny = py;
+        if (GetAsyncKeyState(VK_LEFT) || GetAsyncKeyState('A')) {
+            nx -= 2;
+        }
+        if (GetAsyncKeyState(VK_RIGHT) || GetAsyncKeyState('D')) {
+            nx += 2;
+        }
+        if (GetAsyncKeyState(VK_UP) || GetAsyncKeyState('W')) {
+            ny -= 2;
+        }
+        if (GetAsyncKeyState(VK_DOWN) || GetAsyncKeyState('S')) {
+            ny += 2;
+        }
+        if (CheckPos(nx, ny) && CheckPos(nx + 42, ny + 42) &&
+            CheckPos(nx + 42, ny) && CheckPos(nx, ny + 42))
+            px = nx, py = ny;
+
+        // character switching
+        // animations are kept as in original game.cpp but only SetFrame calls were present
+        if (GetAsyncKeyState('C')) {
+            character.SetFrame(0);
+            characterState = 0;
+        }
+        if (GetAsyncKeyState('B')) {
+            character.SetFrame(1);
+            characterState = 1;
+        }
+        if (GetAsyncKeyState('V')) {
+            character.SetFrame(2);
+            characterState = 2;
+        }
+        if (GetAsyncKeyState('N') && stickUnlocked == true) {
+            character.SetFrame(3);
+            characterState = 3;
+        }
+    }
+}

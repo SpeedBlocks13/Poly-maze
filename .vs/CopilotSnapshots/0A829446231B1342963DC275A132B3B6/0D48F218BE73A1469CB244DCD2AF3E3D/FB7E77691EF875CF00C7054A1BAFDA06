@@ -1,0 +1,9 @@
+﻿#pragma once
+class Surface;
+
+namespace Tmpl8 {
+    void InitLevel();
+    void ShutdownLevel();
+    void DrawLevel(Surface* screen);
+    bool CheckPos(int x, int y);
+}

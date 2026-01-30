@@ -1,0 +1,66 @@
+﻿#include "level creation.h"
+#include "surface.h"
+
+namespace Tmpl8
+{
+    static Surface tiles("assets/tiles.png");
+    static int spritesheetWidth = 261;
+    static int tileSize = 64;
+    static int spritesheetSpace = 1;
+    static int mapHeight = 8;
+    static int mapWidth = 10;
+    
+    static char map[8][40] = {
+         "aax aax aax aax aax aax aax aax aax aax",
+         "aax aax ad- bb- bb- bb- dd- aax aax aax",
+         "aax aax ab- aax aax aax ab- aax aax aax",
+         "aax aax ab- aax aax aax ab- aax aax aax",
+         "aax ad- dg- dd- aax aax ab- aax aax aax",
+         "aax bc- aa- cg- bb- bb- cd- aax aax aax",
+         "aax bd- cc- cd- aax aax aax aax aax aax",
+         "aax aax aax aax aax aax aax aax aax aax"
+    };
+
+    static Sprite doors(new Surface("assets/doors.png"), 44);
+
+    void DrawTile(int tx, int ty, Surface* screen, int x, int y)
+    {
+        Pixel* src = tiles.GetBuffer() + 1 + tx * (tileSize + spritesheetSpace) + (1 + ty * (tileSize + spritesheetSpace)) * spritesheetWidth;
+        Pixel* dst = screen->GetBuffer() + x + y * 800;
+        for (int i = 0; i < tileSize; i++, src += spritesheetWidth, dst += 800)
+            for (int j = 0; j < tileSize; j++)
+                dst[j] = src[j];
+    }
+
+    bool CheckPos(int x, int y)
+    {
+        int tx = x / tileSize, ty = y / tileSize;
+        return map[ty][tx * 4 + 2] != 'x';
+    }
+
+    void InitLevel() {}
+    void ShutdownLevel() {}
+
+    void DrawLevel(Surface* screen)
+    {
+        for (int y = 0; y < mapHeight; y++)
+            for (int x = 0; x < mapWidth; x++)
+            {
+                int tx = map[y][x * 4] - 'a';
+                int ty = map[y][x * 4 + 1] - 'a';
+                DrawTile(tx, ty, screen, x * tileSize, y * tileSize);
+            }
+
+        doors.SetFrame(4);
+        doors.Draw(screen, tileSize * 3 - tileSize, tileSize * 4 - tileSize);
+
+        doors.SetFrame(15);
+        doors.Draw(screen, tileSize * 5 - tileSize, tileSize * 2 - tileSize);
+
+        doors.SetFrame(10);
+        doors.Draw(screen, tileSize * 7 - tileSize, tileSize * 4 - tileSize);
+
+        doors.SetFrame(25);
+        doors.Draw(screen, tileSize * 5 - tileSize, tileSize * 6 - tileSize);
+    }
+}

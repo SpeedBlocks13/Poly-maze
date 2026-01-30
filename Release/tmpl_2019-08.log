@@ -1,0 +1,12 @@
+﻿  game.cpp
+C:\Users\ruben\Documents\TheTemplate (1)\game.cpp(204,69): warning C4244: '=': conversion from 'double' to '_Ty', possible loss of data
+C:\Users\ruben\Documents\TheTemplate (1)\game.cpp(204,69): warning C4244:         with
+C:\Users\ruben\Documents\TheTemplate (1)\game.cpp(204,69): warning C4244:         [
+C:\Users\ruben\Documents\TheTemplate (1)\game.cpp(204,69): warning C4244:             _Ty=int
+C:\Users\ruben\Documents\TheTemplate (1)\game.cpp(204,69): warning C4244:         ]
+C:\Users\ruben\Documents\TheTemplate (1)\game.cpp(205,69): warning C4244: '=': conversion from 'double' to '_Ty', possible loss of data
+C:\Users\ruben\Documents\TheTemplate (1)\game.cpp(205,69): warning C4244:         with
+C:\Users\ruben\Documents\TheTemplate (1)\game.cpp(205,69): warning C4244:         [
+C:\Users\ruben\Documents\TheTemplate (1)\game.cpp(205,69): warning C4244:             _Ty=int
+C:\Users\ruben\Documents\TheTemplate (1)\game.cpp(205,69): warning C4244:         ]
+  tmpl_2019-08.vcxproj -> C:\Users\ruben\Documents\TheTemplate (1)\tmpl_2019-08_x64.exe

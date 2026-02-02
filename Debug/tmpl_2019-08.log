@@ -1,0 +1,12 @@
+﻿  game.cpp
+C:\Users\ruben\OneDrive\Documenten\TheTemplate (1)\game.cpp(179,69): warning C4244: '=': conversion from 'double' to '_Ty', possible loss of data
+C:\Users\ruben\OneDrive\Documenten\TheTemplate (1)\game.cpp(179,69): warning C4244:         with
+C:\Users\ruben\OneDrive\Documenten\TheTemplate (1)\game.cpp(179,69): warning C4244:         [
+C:\Users\ruben\OneDrive\Documenten\TheTemplate (1)\game.cpp(179,69): warning C4244:             _Ty=int
+C:\Users\ruben\OneDrive\Documenten\TheTemplate (1)\game.cpp(179,69): warning C4244:         ]
+C:\Users\ruben\OneDrive\Documenten\TheTemplate (1)\game.cpp(180,69): warning C4244: '=': conversion from 'double' to '_Ty', possible loss of data
+C:\Users\ruben\OneDrive\Documenten\TheTemplate (1)\game.cpp(180,69): warning C4244:         with
+C:\Users\ruben\OneDrive\Documenten\TheTemplate (1)\game.cpp(180,69): warning C4244:         [
+C:\Users\ruben\OneDrive\Documenten\TheTemplate (1)\game.cpp(180,69): warning C4244:             _Ty=int
+C:\Users\ruben\OneDrive\Documenten\TheTemplate (1)\game.cpp(180,69): warning C4244:         ]
+LINK : fatal error LNK1201: error writing to program database 'C:\Users\ruben\OneDrive\Documenten\TheTemplate (1)\tmpl_2019-08_x64_debug.pdb'; check for insufficient disk space, invalid path, or insufficient privilege

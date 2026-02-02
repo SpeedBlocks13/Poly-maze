@@ -1,8 +1,0 @@
-﻿#pragma once
-class Surface;
-
-namespace Tmpl8 {
-    void InitItems();
-    void ShutdownItems();
-    void UpdateAndDrawItems(Surface* screen);
-}

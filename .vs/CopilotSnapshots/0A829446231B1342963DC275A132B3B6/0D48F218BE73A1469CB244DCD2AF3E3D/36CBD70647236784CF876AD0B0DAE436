@@ -1,8 +1,0 @@
-﻿#pragma once
-class Surface;
-
-namespace Tmpl8 {
-    void InitCharacter();
-    void ShutdownCharacter();
-    void UpdateAndDrawCharacter(Surface* screen);
-}

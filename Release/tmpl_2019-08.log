@@ -1,0 +1,4 @@
+﻿  game.cpp
+C:\Users\ruben\Documents\poly-maze\game.cpp(294,82): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+C:\Users\ruben\Documents\poly-maze\game.cpp(295,82): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+  tmpl_2019-08.vcxproj -> C:\Users\ruben\Documents\poly-maze\tmpl_2019-08_x64.exe

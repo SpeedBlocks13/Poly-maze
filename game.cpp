@@ -291,8 +291,8 @@ namespace Tmpl8
             if (itemHolding == i)
             {
                 int previousItem = itemHolding;
-                items[previousItem].x = floor((px + characterCenter) / tileSize) * tileSize;
-                items[previousItem].y = floor((py + characterCenter) / tileSize) * tileSize;
+                items[previousItem].x = static_cast<int>((px + characterCenter) / tileSize) * tileSize;
+                items[previousItem].y = static_cast<int>((py + characterCenter) / tileSize) * tileSize;
                 items[previousItem].pickedUp = false;
                 holdingItem = false;
                 itemHolding = -1;

@@ -23,7 +23,7 @@ namespace Tmpl8
     int mapWidth = 6; //how many tiles in width is the map
     int characterSize = 40; //how many pixels is the character
     int characterCenter = characterSize / 2; //defines the chatrzcter center
-    int level = 11; //what level are you on
+    int level = 0; //what level are you on
     int money = 0; //money total
     int moneyGainedInLevel = 0; //money gained in level
     bool mb = false; //is the money counter in level 11 big (for the flashy animation)
@@ -58,24 +58,33 @@ namespace Tmpl8
     auto currentTime = std::chrono::steady_clock::now(); //current time
     auto time = std::chrono::duration<float>(currentTime - startTime).count(); //time between started and current time
 
-    std::vector<int> doorX; //door x position
-    std::vector<int> doorY; //door y position
-    std::vector<int> doorCriteria; //0 is no criteria, 1-4 is character criteria, 5-10 is key criteria (see doorsprite for order)
-    std::vector<bool> doorLocked; //is the door locked
-    std::vector<bool> doorOpened; //is the door opened
-    std::vector<int> frameOfDoor; //door frame
-    std::vector<bool> doorHidden; //door hidden
+    Sprite doorsSprite(new Surface("assets/doors.png"), 44); //door sprite creation
+    struct Door
+    {
+        int x, y; //doors position
+        int criteria; //0 is no criteria, 1-4 is character criteria, 5-10 is key criteria (see doorsprite for order)
+        bool locked; //is the door locked
+        bool open; //is the door opened
+        int frame; //what frame of the spritre is the door on
+        bool hidden;
+    };
+    std::vector<Door> doors;
+
     int dFu[11] = {0, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40}; //door frames that define an up door
     int dFl[11] = {1, 5, 9, 13, 17, 21, 25, 29, 33, 37, 41}; //door frames that define a left door
     int dFd[11] = {2, 6, 10, 14, 18, 22, 26, 30, 34, 38, 42}; //door frames that define a down door
     int dFr[11] = {3, 7, 11, 15, 19, 23, 27, 31, 35, 39, 43}; //door frames that define a right door
 
-    std::vector<int> itemX; //item x
-    std::vector<int> itemY; //item y
-    std::vector<int> frameOfItem; //item frame
-    std::vector<bool> itemPickedUp; //is the item picked up
-    std::vector<bool> itemUsed; //is the item used
-    std::vector<bool> itemHidden; //is the item hidden
+    Sprite itemsSprite(new Surface("assets/items.png"), 8); //item sprite creation
+    struct Item
+    {
+        int x, y;
+        int frame;
+        bool pickedUp;
+        bool used;
+        bool hidden;
+    };
+    std::vector<Item> items;
 
     std::vector<int> tutorialX = { tileSize * 1 - tileSize, tileSize * 1 - tileSize, tileSize * 4 - tileSize, tileSize * 8 - tileSize, tileSize * 5 - tileSize, tileSize * 1 - tileSize, tileSize * 2 - tileSize/2, tileSize * 9 - tileSize, tileSize * 7 - tileSize, tileSize * 13 - tileSize }; //tutorial text baloon x
     std::vector<int> tutorialY = { tileSize * 3 - tileSize, tileSize * 4 - tileSize, tileSize * 1 - tileSize, tileSize * 4 - tileSize, tileSize * 7 - tileSize, tileSize * 5 - tileSize, tileSize * 7 - tileSize, tileSize * 9 - tileSize, tileSize * 4 - tileSize, tileSize * 6 - tileSize }; //tutorial text baloon y
@@ -94,9 +103,8 @@ namespace Tmpl8
     Sprite character(new Surface("assets/character sprites.png"), 4); //character sprite creation
     int px = (tileSize * 2 - tileSize) + ((tileSize - characterSize) / 2), py = (tileSize * 2 - tileSize) + ((tileSize - characterSize) / 2); //sets the character pos
 
-    Sprite doors(new Surface("assets/doors.png"), 44); //door sprite creation
-    Sprite items(new Surface("assets/items.png"), 8); //item sprite creation
-    Sprite tutorial(new Surface("assets/tutorial.png"), 10); //tutorial sprite creation
+    
+    Sprite tutorialSprite(new Surface("assets/tutorial.png"), 10); //tutorial sprite creation
     Sprite thanksForPlaying(new Surface("assets/thanks for playing.png"), 1); //"thanks for playing" sprite creation
     Sprite lvlbuttons(new Surface("assets/level buttons.png"), 11); //level buttons sprite creation
 
@@ -135,28 +143,110 @@ namespace Tmpl8
                 dst[j] = src[j];
     }
 
+    //sets all doors correctly in level
+    void AddDoorsX(std::vector<int> xPositions)
+    {
+        doors.resize(xPositions.size());
+        for (int i = 0; i < xPositions.size(); i++)
+            doors[i].x = xPositions[i];
+    }
+    void AddDoorsY(std::vector<int> xPositions)
+    {
+        doors.resize(xPositions.size());
+        for (int i = 0; i < xPositions.size(); i++)
+            doors[i].y = xPositions[i];
+    }
+    void AddDoorsCriteria(std::vector<int> xPositions)
+    {
+        doors.resize(xPositions.size());
+        for (int i = 0; i < xPositions.size(); i++)
+            doors[i].criteria = xPositions[i];
+    }
+    void AddDoorsLocked(std::vector<int> xPositions)
+    {
+        doors.resize(xPositions.size());
+        for (int i = 0; i < xPositions.size(); i++)
+            doors[i].locked = xPositions[i];
+    }
+    void AddDoorsOpen(std::vector<int> xPositions)
+    {
+        doors.resize(xPositions.size());
+        for (int i = 0; i < xPositions.size(); i++)
+            doors[i].open = xPositions[i];
+    }
+    void AddDoorsFrame(std::vector<int> xPositions)
+    {
+        doors.resize(xPositions.size());
+        for (int i = 0; i < xPositions.size(); i++)
+            doors[i].frame = xPositions[i];
+    }
+    void AddDoorsHidden(std::vector<int> xPositions)
+    {
+        doors.resize(xPositions.size());
+        for (int i = 0; i < xPositions.size(); i++)
+            doors[i].hidden = xPositions[i];
+    }
+
+    //sets all the items correctly in level
+    void AddItemsX(std::vector<int> xPositions)
+    {
+        items.resize(xPositions.size());
+        for (int i = 0; i < xPositions.size(); i++)
+            items[i].x = xPositions[i];
+    }
+    void AddItemsY(std::vector<int> xPositions)
+    {
+        items.resize(xPositions.size());
+        for (int i = 0; i < xPositions.size(); i++)
+            items[i].y = xPositions[i];
+    }
+    void AddItemsFrame(std::vector<int> xPositions)
+    {
+        items.resize(xPositions.size());
+        for (int i = 0; i < xPositions.size(); i++)
+            items[i].frame = xPositions[i];
+    }
+    void AddItemsPickedUp(std::vector<int> xPositions)
+    {
+        items.resize(xPositions.size());
+        for (int i = 0; i < xPositions.size(); i++)
+            items[i].pickedUp = xPositions[i];
+    }
+    void AddItemsUsed(std::vector<int> xPositions)
+    {
+        items.resize(xPositions.size());
+        for (int i = 0; i < xPositions.size(); i++)
+            items[i].used = xPositions[i];
+    }
+    void AddItemsHidden(std::vector<int> xPositions)
+    {
+        items.resize(xPositions.size());
+        for (int i = 0; i < xPositions.size(); i++)
+            items[i].hidden = xPositions[i];
+    }
+
     void checkItem(int px, int py)
     {
         for (int i = 0; i < itenAmount; i++)
         {
-            if (px + characterCenter >= itemX[i] && px + characterCenter <= itemX[i] + 64 && py + characterCenter >= itemY[i] && py + characterCenter <= itemY[i] + 64 && itemHidden[i] == false && itemUsed[i] == false)
+            if (px + characterCenter >= items[i].x && px + characterCenter <= items[i].x + 64 && py + characterCenter >= items[i].y && py + characterCenter <= items[i].y + 64 && items[i].hidden == false && items[i].used == false)
             {
                 if (itemHolding != i)
                 {
-                    if (frameOfItem[i] == 0)
+                    if (items[i].frame == 0)
                     {
-                        itemPickedUp[i] = true;
-                        itemX[i] = -64;
-                        itemY[i] = -64;
+                        items[i].pickedUp = true;
+                        items[i].x = -64;
+                        items[i].y = -64;
                         money++;
                         moneyGainedInLevel++;
                         return;
                     }
-                    else if (frameOfItem[i] == 1)
+                    else if (items[i].frame == 1)
                     {
                         itemHolding = -1;
                         holdingItem = false;
-                        itemUsed[i] = true;
+                        items[i].used = true;
                         begin = false;
 
                         if (oneLevelSpeedrun == true)
@@ -177,7 +267,7 @@ namespace Tmpl8
                     }
                     else if (holdingItem == false)
                     {
-                        itemPickedUp[i] = true;
+                        items[i].pickedUp = true;
                         itemHolding = i;
                         holdingItem = true;
                         return;
@@ -186,11 +276,11 @@ namespace Tmpl8
                     {
                         // dropping previous item at this item's position
                         int previousItem = itemHolding;
-                        itemX[previousItem] = itemX[i];
-                        itemY[previousItem] = itemY[i];
-                        itemPickedUp[previousItem] = false;
+                        items[previousItem].x = items[i].x;
+                        items[previousItem].y = items[i].y;
+                        items[previousItem].pickedUp = false;
                         // picking up new item
-                        itemPickedUp[i] = true;
+                        items[i].pickedUp = true;
                         itemHolding = i;
                         holdingItem = true;
                         return;
@@ -201,9 +291,9 @@ namespace Tmpl8
             if (itemHolding == i)
             {
                 int previousItem = itemHolding;
-                itemX[previousItem] = floor((px + characterCenter) / tileSize) * tileSize;
-                itemY[previousItem] = floor((py + characterCenter) / tileSize) * tileSize;
-                itemPickedUp[previousItem] = false;
+                items[previousItem].x = floor((px + characterCenter) / tileSize) * tileSize;
+                items[previousItem].y = floor((py + characterCenter) / tileSize) * tileSize;
+                items[previousItem].pickedUp = false;
                 holdingItem = false;
                 itemHolding = -1;
             }
@@ -214,106 +304,106 @@ namespace Tmpl8
     {
         for (int i = 0; i < doorAmount; i++)
         {
-            if (doorCriteria[i] < 5 && doorCriteria[i] > 0 && doorCriteria[i] != (characterState + 1))
+            if (doors[i].criteria < 5 && doors[i].criteria > 0 && doors[i].criteria != (characterState + 1))
             {
-                doorLocked[i] = true;
+                doors[i].locked = true;
             }
-            else if (doorCriteria[i] < 5 && doorCriteria[i] > 0 && doorCriteria[i] == (characterState + 1))
+            else if (doors[i].criteria < 5 && doors[i].criteria > 0 && doors[i].criteria == (characterState + 1))
             {
-                doorLocked[i] = false;
+                doors[i].locked = false;
             }
 
-            if (itemHolding >=0 && doorCriteria[i] >= 5 && doorCriteria[i] == (frameOfItem[itemHolding] + 3) && doorLocked[i] == true && nx + characterCenter >= doorX[i] && nx + characterCenter <= doorX[i] + 64 && ny + characterCenter >= doorY[i] && ny + characterCenter <= doorY[i] + 64)
+            if (itemHolding >=0 && doors[i].criteria >= 5 && doors[i].criteria == (items[itemHolding].frame + 3) && doors[i].locked == true && nx + characterCenter >= doors[i].x && nx + characterCenter <= doors[i].x + 64 && ny + characterCenter >= doors[i].y && ny + characterCenter <= doors[i].y + 64)
             {
-                doorLocked[i] = false;
-                itemUsed[itemHolding] = true;
+                doors[i].locked = false;
+                items[itemHolding].used = true;
                 holdingItem = false;
                 itemHolding = -1;
             }
 
             //open door when unlocked
-            if (doorLocked[i] == false && doorOpened[i] == false)
+            if (doors[i].locked == false && doors[i].open == false)
             {
                 for (int j = 0; j < 11; j++)
                 {
-                    if (frameOfDoor[i] == dFu[j])
+                    if (doors[i].frame == dFu[j])
                     {
-                        frameOfDoor[i] = frameOfDoor[i] + 1;
-                        doorOpened[i] = true;
+                        doors[i].frame = doors[i].frame + 1;
+                        doors[i].open = true;
                     }
-                    else if (frameOfDoor[i] == dFl[j])
+                    else if (doors[i].frame == dFl[j])
                     {
-                        frameOfDoor[i] = frameOfDoor[i] + 1;
-                        doorOpened[i] = true;
+                        doors[i].frame = doors[i].frame + 1;
+                        doors[i].open = true;
                     }
-                    else if (frameOfDoor[i] == dFd[j])
+                    else if (doors[i].frame == dFd[j])
                     {
-                        frameOfDoor[i] = frameOfDoor[i] + 1;
-                        doorOpened[i] = true;
+                        doors[i].frame = doors[i].frame + 1;
+                        doors[i].open = true;
                     }
-                    else if (frameOfDoor[i] == dFr[j])
+                    else if (doors[i].frame == dFr[j])
                     {
-                        frameOfDoor[i] = frameOfDoor[i] - 3;
-                        doorOpened[i] = true;
+                        doors[i].frame = doors[i].frame - 3;
+                        doors[i].open = true;
                     }
                 }
             }
             //close door when locked
-            if (doorLocked[i] == true && doorOpened[i] == true)
+            if (doors[i].locked == true && doors[i].open == true)
             {
                 for (int j = 0; j < 11; j++)
                 {
-                    if (frameOfDoor[i] == dFu[j])
+                    if (doors[i].frame == dFu[j])
                     {
-                        frameOfDoor[i] = frameOfDoor[i] + 3;
-                        doorOpened[i] = false;
+                        doors[i].frame = doors[i].frame + 3;
+                        doors[i].open = false;
                     }
-                    else if (frameOfDoor[i] == dFl[j])
+                    else if (doors[i].frame == dFl[j])
                     {
-                        frameOfDoor[i] = frameOfDoor[i] - 1;
-                        doorOpened[i] = false;
+                        doors[i].frame = doors[i].frame - 1;
+                        doors[i].open = false;
                     }
-                    else if (frameOfDoor[i] == dFd[j])
+                    else if (doors[i].frame == dFd[j])
                     {
-                        frameOfDoor[i] = frameOfDoor[i] - 1;
-                        doorOpened[i] = false;
+                        doors[i].frame = doors[i].frame - 1;
+                        doors[i].open = false;
                     }
-                    else if (frameOfDoor[i] == dFr[j])
+                    else if (doors[i].frame == dFr[j])
                     {
-                        frameOfDoor[i] = frameOfDoor[i] - 1;
-                        doorOpened[i] = false;
+                        doors[i].frame = doors[i].frame - 1;
+                        doors[i].open = false;
                     }
                 }
             }
 
-            if (doorLocked[i] == true)
+            if (doors[i].locked == true)
             {
                 for (int j = 0; j < 11; j++)
                 {
                     //doors up
-                    if (frameOfDoor[i] == dFu[j] && nx + characterSize >= doorX[i] && nx <= doorX[i] + 64 && ny + characterSize >= doorY[i] && ny <= doorY[i] + 12)
+                    if (doors[i].frame == dFu[j] && nx + characterSize >= doors[i].x && nx <= doors[i].x + 64 && ny + characterSize >= doors[i].y && ny <= doors[i].y + 12)
                     {
                         return false;
                     }
                     //doors left
-                    else if (frameOfDoor[i] == dFl[j] && nx + characterSize >= doorX[i] && nx <= doorX[i] + 12 && ny >= doorY[i] && ny <= doorY[i] + 64)
+                    else if (doors[i].frame == dFl[j] && nx + characterSize >= doors[i].x && nx <= doors[i].x + 12 && ny >= doors[i].y && ny <= doors[i].y + 64)
                     {
                         return false;
                     }
                     //doors down
-                    else if (frameOfDoor[i] == dFd[j] && nx >= doorX[i] && nx <= doorX[i] + 64 && ny + characterSize >= doorY[i] + 52 && ny <= doorY[i] + 64)
+                    else if (doors[i].frame == dFd[j] && nx >= doors[i].x && nx <= doors[i].x + 64 && ny + characterSize >= doors[i].y + 52 && ny <= doors[i].y + 64)
                     {
                         return false;
                     }
                     //doors right
-                    else if (frameOfDoor[i] == dFr[j] && nx + characterSize >= doorX[i] + 52 && nx <= doorX[i] + 64 && ny >= doorY[i] && ny <= doorY[i] + 64)
+                    else if (doors[i].frame == dFr[j] && nx + characterSize >= doors[i].x + 52 && nx <= doors[i].x + 64 && ny >= doors[i].y && ny <= doors[i].y + 64)
                     {
                         return false;
                     }
                 }
             }
         }
-        if (level == 0 && doorLocked[3] == false) itemHidden[1] = false;
+        if (level == 0 && doors[3].locked == false) items[1].hidden = false;
         return true;
     }
 
@@ -335,19 +425,19 @@ namespace Tmpl8
                 doorAmount = 4;
                 itenAmount = 2;
 
-                doorX = { tileSize * 3 - tileSize, tileSize * 5 - tileSize, tileSize * 7 - tileSize, tileSize * 5 - tileSize };
-                doorY = { tileSize * 4 - tileSize, tileSize * 2 - tileSize, tileSize * 4 - tileSize, tileSize * 6 - tileSize };
-                doorCriteria = { 1, 3, 2, 6 };
-                doorLocked = { true, true, true, true };
-                doorOpened = { false, false, false, false };
-                frameOfDoor = { 4, 15, 10, 25 };
+                AddDoorsX({ tileSize * 3 - tileSize, tileSize * 5 - tileSize, tileSize * 7 - tileSize, tileSize * 5 - tileSize });
+                AddDoorsY({ tileSize * 4 - tileSize, tileSize * 2 - tileSize, tileSize * 4 - tileSize, tileSize * 6 - tileSize });
+                AddDoorsCriteria({ 1, 3, 2, 6 });
+                AddDoorsLocked({ true, true, true, true });
+                AddDoorsOpen({ false, false, false, false });
+                AddDoorsFrame({ 4, 15, 10, 25 });
 
-                itemX = { tileSize * 7 - tileSize, tileSize * 3 - tileSize };
-                itemY = { tileSize * 6 - tileSize, tileSize * 6 - tileSize };
-                frameOfItem = { 3, 1 };
-                itemPickedUp = { false, false };
-                itemUsed = { false, false };
-                itemHidden = { false, true };
+                AddItemsX({ tileSize * 7 - tileSize, tileSize * 3 - tileSize });
+                AddItemsY({ tileSize * 6 - tileSize, tileSize * 6 - tileSize });
+                AddItemsFrame({ 3, 1 });
+                AddItemsPickedUp({ false, false });
+                AddItemsUsed({ false, false });
+                AddItemsHidden({ false, true });
 
                 mapHeight = 8;
                 mapWidth = 8;
@@ -378,19 +468,19 @@ namespace Tmpl8
                 doorAmount = 3;
                 itenAmount = 3;
 
-                doorX = { tileSize * 2 - tileSize, tileSize * 4 - tileSize, tileSize * 6 - tileSize };
-                doorY = { tileSize * 4 - tileSize, tileSize * 4 - tileSize, tileSize * 6 - tileSize };
-                doorCriteria = { 3, 2, 5 };
-                doorLocked = { true, true, true };
-                doorOpened = { false, false, false };
-                frameOfDoor = { 12, 10, 20 };
+                AddDoorsX({ tileSize * 2 - tileSize, tileSize * 4 - tileSize, tileSize * 6 - tileSize });
+                AddDoorsY({ tileSize * 4 - tileSize, tileSize * 4 - tileSize, tileSize * 6 - tileSize });
+                AddDoorsCriteria({ 3, 2, 5 });
+                AddDoorsLocked({ true, true, true });
+                AddDoorsOpen({ false, false, false });
+                AddDoorsFrame({ 12, 10, 20 });
 
-                itemX = { tileSize * 2 - tileSize, tileSize * 4 - tileSize, tileSize * 8 - tileSize };
-                itemY = { tileSize * 2 - tileSize, tileSize * 3 - tileSize, tileSize * 3 - tileSize };
-                frameOfItem = { 0, 2, 1 };
-                itemPickedUp = { false, false, false };
-                itemUsed = { false, false, false };
-                itemHidden = { false, false, false };
+                AddItemsX({ tileSize * 2 - tileSize, tileSize * 4 - tileSize, tileSize * 8 - tileSize });
+                AddItemsY({ tileSize * 2 - tileSize, tileSize * 3 - tileSize, tileSize * 3 - tileSize });
+                AddItemsFrame({ 0, 2, 1 });
+                AddItemsPickedUp({ false, false, false });
+                AddItemsUsed({ false, false, false });
+                AddItemsHidden({ false, false, false });
 
                 mapHeight = 13;
                 mapWidth = 10;
@@ -426,19 +516,19 @@ namespace Tmpl8
                 doorAmount = 5;
                 itenAmount = 5;
 
-                doorX = { tileSize * 8 - tileSize, tileSize * 8 - tileSize, tileSize * 8 - tileSize, tileSize * 6 - tileSize, tileSize * 5 - tileSize };
-                doorY = { tileSize * 3 - tileSize, tileSize * 5 - tileSize, tileSize * 7 - tileSize, tileSize * 5 - tileSize, tileSize * 7 - tileSize };
-                doorCriteria = { 7, 2, 10, 3, 8 };
-                doorLocked = { true, true, true, true, true };
-                doorOpened = { false, false, false, false, false };
-                frameOfDoor = { 31, 11, 43, 15, 33 };
+                AddDoorsX({ tileSize * 8 - tileSize, tileSize * 8 - tileSize, tileSize * 8 - tileSize, tileSize * 6 - tileSize, tileSize * 5 - tileSize });
+                AddDoorsY({ tileSize * 3 - tileSize, tileSize * 5 - tileSize, tileSize * 7 - tileSize, tileSize * 5 - tileSize, tileSize * 7 - tileSize });
+                AddDoorsCriteria({ 7, 2, 10, 3, 8 });
+                AddDoorsLocked({ true, true, true, true, true });
+                AddDoorsOpen({ false, false, false, false, false });
+                AddDoorsFrame({ 31, 11, 43, 15, 33 });
 
-                itemX = { tileSize * 9 - tileSize, tileSize * 5 - tileSize, tileSize * 9 - tileSize, tileSize * 9 - tileSize, tileSize * 3 - tileSize };
-                itemY = { tileSize * 3 - tileSize, tileSize * 5 - tileSize, tileSize * 5 - tileSize, tileSize * 7 - tileSize, tileSize * 7 - tileSize };
-                frameOfItem = { 7, 4, 0, 5, 1 };
-                itemPickedUp = { false, false, false, false, false };
-                itemUsed = { false, false, false, false, false };
-                itemHidden = { false, false, false, false, false };
+                AddItemsX({ tileSize * 9 - tileSize, tileSize * 5 - tileSize, tileSize * 9 - tileSize, tileSize * 9 - tileSize, tileSize * 3 - tileSize });
+                AddItemsY({ tileSize * 3 - tileSize, tileSize * 5 - tileSize, tileSize * 5 - tileSize, tileSize * 7 - tileSize, tileSize * 7 - tileSize });
+                AddItemsFrame({ 7, 4, 0, 5, 1 });
+                AddItemsPickedUp({ false, false, false, false, false });
+                AddItemsUsed({ false, false, false, false, false });
+                AddItemsHidden({ false, false, false, false, false });
 
                 mapHeight = 9;
                 mapWidth = 10;
@@ -471,23 +561,23 @@ namespace Tmpl8
                 doorAmount = 9;
                 itenAmount = 10;
 
-                doorX = { tileSize * 4 - tileSize, tileSize * 3 - tileSize, tileSize * 5 - tileSize, tileSize * 4 - tileSize, tileSize * 3 - tileSize, tileSize * 4 - tileSize, tileSize * 5 - tileSize, tileSize * 3 - tileSize, tileSize * 4 - tileSize };
-                doorY = { tileSize * 5 - tileSize, tileSize * 6 - tileSize, tileSize * 6 - tileSize, tileSize * 7 - tileSize, tileSize * 8 - tileSize, tileSize * 9 - tileSize, tileSize * 9 - tileSize, tileSize * 10 - tileSize, tileSize * 11 - tileSize };
-                doorCriteria = { 3, 10, 9, 2, 6, 1, 7, 8, 3 };
-                doorLocked = { true, true, true, true, true, true, true, true, true };
-                doorOpened = { false, false, false, false, false, false, false, false, false };
-                frameOfDoor = { 12, 41, 39, 8, 25, 4, 31, 33, 12 };
+                AddDoorsX({ tileSize * 4 - tileSize, tileSize * 3 - tileSize, tileSize * 5 - tileSize, tileSize * 4 - tileSize, tileSize * 3 - tileSize, tileSize * 4 - tileSize, tileSize * 5 - tileSize, tileSize * 3 - tileSize, tileSize * 4 - tileSize });
+                AddDoorsY({ tileSize * 5 - tileSize, tileSize * 6 - tileSize, tileSize * 6 - tileSize, tileSize * 7 - tileSize, tileSize * 8 - tileSize, tileSize * 9 - tileSize, tileSize * 9 - tileSize, tileSize * 10 - tileSize, tileSize * 11 - tileSize });
+                AddDoorsCriteria({ 3, 10, 9, 2, 6, 1, 7, 8, 3 });
+                AddDoorsLocked({ true, true, true, true, true, true, true, true, true });
+                AddDoorsOpen({ false, false, false, false, false, false, false, false, false });
+                AddDoorsFrame({ 12, 41, 39, 8, 25, 4, 31, 33, 12 });
 
-                itemX = { tileSize * 2 - tileSize, tileSize * 2 - tileSize, tileSize * 6 - tileSize, tileSize * 2 - tileSize, tileSize * 4 - tileSize, //keys
+                AddItemsX({ tileSize * 2 - tileSize, tileSize * 2 - tileSize, tileSize * 6 - tileSize, tileSize * 2 - tileSize, tileSize * 4 - tileSize, //keys
                     tileSize * 8 - tileSize, tileSize * 8 - tileSize, tileSize * 6 - tileSize, tileSize * 6 - tileSize, //coins
-                    tileSize * 7 - tileSize };//diamond
-                itemY = { tileSize * 6 - tileSize, tileSize * 8 - tileSize, tileSize * 9 - tileSize, tileSize * 10 - tileSize, tileSize * 12 - tileSize, //keys
+                    tileSize * 7 - tileSize });//diamond
+                AddItemsY({ tileSize * 6 - tileSize, tileSize * 8 - tileSize, tileSize * 9 - tileSize, tileSize * 10 - tileSize, tileSize * 12 - tileSize, //keys
                     tileSize * 5 - tileSize, tileSize * 7 - tileSize, tileSize * 7 - tileSize, tileSize * 5 - tileSize, //coins
-                    tileSize * 6 - tileSize }; //diamond
-                frameOfItem = { 6, 5, 3, 7, 4, 0, 0, 0, 0, 1 };
-                itemPickedUp = { false, false, false, false, false, false, false, false, false, false };
-                itemUsed = { false, false, false, false, false, false, false, false, false, false };
-                itemHidden = { false, false, false, false, false, false, false, false, false, false };
+                    tileSize * 6 - tileSize }); //diamond
+                AddItemsFrame({ 6, 5, 3, 7, 4, 0, 0, 0, 0, 1 });
+                AddItemsPickedUp({ false, false, false, false, false, false, false, false, false, false });
+                AddItemsUsed({ false, false, false, false, false, false, false, false, false, false });
+                AddItemsHidden({ false, false, false, false, false, false, false, false, false, false });
 
                 mapHeight = 13;
                 mapWidth = 9;
@@ -523,19 +613,19 @@ namespace Tmpl8
                 doorAmount = 18; //18
                 itenAmount = 8; //8
 
-                doorX = { tileSize * 3 - tileSize, tileSize * 4 - tileSize, tileSize * 6 - tileSize, tileSize * 7 - tileSize, tileSize * 8 - tileSize, tileSize * 9 - tileSize, tileSize * 10 - tileSize, tileSize * 10 - tileSize, tileSize * 11 - tileSize, tileSize * 12 - tileSize, tileSize * 13 - tileSize, tileSize * 14 - tileSize, tileSize * 16 - tileSize, tileSize * 17 - tileSize, tileSize * 17 - tileSize, tileSize * 19 - tileSize, tileSize * 20 - tileSize, tileSize * 21 - tileSize };
-                doorY = { tileSize * 11 - tileSize, tileSize * 14 - tileSize, tileSize * 14 - tileSize, tileSize * 11 - tileSize, tileSize * 14 - tileSize, tileSize * 12 - tileSize, tileSize * 8 - tileSize, tileSize * 14 - tileSize, tileSize * 9 - tileSize, tileSize * 16 - tileSize, tileSize * 8 - tileSize, tileSize * 4 - tileSize, tileSize * 7 - tileSize, tileSize * 9 - tileSize, tileSize * 12 - tileSize, tileSize * 6 - tileSize, tileSize * 5 - tileSize, tileSize * 11 - tileSize };
-                doorCriteria = { 7, 2, 3, 5, 1, 3, 1, 2, 2, 1, 6, 3, 2, 1, 2, 1, 8, 3 };
-                doorLocked = { true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true };
-                doorOpened = { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false };
-                frameOfDoor = { 28, 9, 13, 20, 5, 13, 6, 11, 9, 4, 24, 15, 10, 7, 9, 5, 32, 13 };
+                AddDoorsX({ tileSize * 3 - tileSize, tileSize * 4 - tileSize, tileSize * 6 - tileSize, tileSize * 7 - tileSize, tileSize * 8 - tileSize, tileSize * 9 - tileSize, tileSize * 10 - tileSize, tileSize * 10 - tileSize, tileSize * 11 - tileSize, tileSize * 12 - tileSize, tileSize * 13 - tileSize, tileSize * 14 - tileSize, tileSize * 16 - tileSize, tileSize * 17 - tileSize, tileSize * 17 - tileSize, tileSize * 19 - tileSize, tileSize * 20 - tileSize, tileSize * 21 - tileSize });
+                AddDoorsY({ tileSize * 11 - tileSize, tileSize * 14 - tileSize, tileSize * 14 - tileSize, tileSize * 11 - tileSize, tileSize * 14 - tileSize, tileSize * 12 - tileSize, tileSize * 8 - tileSize, tileSize * 14 - tileSize, tileSize * 9 - tileSize, tileSize * 16 - tileSize, tileSize * 8 - tileSize, tileSize * 4 - tileSize, tileSize * 7 - tileSize, tileSize * 9 - tileSize, tileSize * 12 - tileSize, tileSize * 6 - tileSize, tileSize * 5 - tileSize, tileSize * 11 - tileSize });
+                AddDoorsCriteria({ 7, 2, 3, 5, 1, 3, 1, 2, 2, 1, 6, 3, 2, 1, 2, 1, 8, 3 });
+                AddDoorsLocked({ true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true });
+                AddDoorsOpen({ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false });
+                AddDoorsFrame({ 28, 9, 13, 20, 5, 13, 6, 11, 9, 4, 24, 15, 10, 7, 9, 5, 32, 13 });
 
-                itemX = { tileSize * 3 - tileSize, tileSize * 7 - tileSize, tileSize * 12 - tileSize, tileSize * 23 - tileSize, tileSize * 2 - tileSize, tileSize * 10 - tileSize, tileSize * 14 - tileSize, tileSize * 20 - tileSize };
-                itemY = { tileSize * 8 - tileSize, tileSize * 10 - tileSize, tileSize * 18 - tileSize, tileSize * 11 - tileSize, tileSize * 14 - tileSize, tileSize * 6 - tileSize, tileSize * 12 - tileSize, tileSize * 3 - tileSize };
-                frameOfItem = { 2, 3, 4, 5, 0, 0, 0, 1 };
-                itemPickedUp = { false, false, false, false, false, false, false, false };
-                itemUsed = { false, false, false, false, false, false, false, false };
-                itemHidden = { false, false, false, false, false, false, false, false };
+                AddItemsX({ tileSize * 3 - tileSize, tileSize * 7 - tileSize, tileSize * 12 - tileSize, tileSize * 23 - tileSize, tileSize * 2 - tileSize, tileSize * 10 - tileSize, tileSize * 14 - tileSize, tileSize * 20 - tileSize });
+                AddItemsY({ tileSize * 8 - tileSize, tileSize * 10 - tileSize, tileSize * 18 - tileSize, tileSize * 11 - tileSize, tileSize * 14 - tileSize, tileSize * 6 - tileSize, tileSize * 12 - tileSize, tileSize * 3 - tileSize });
+                AddItemsFrame({ 2, 3, 4, 5, 0, 0, 0, 1 });
+                AddItemsPickedUp({ false, false, false, false, false, false, false, false });
+                AddItemsUsed({ false, false, false, false, false, false, false, false });
+                AddItemsHidden({ false, false, false, false, false, false, false, false });
 
                 mapHeight = 19;
                 mapWidth = 24;
@@ -579,23 +669,23 @@ namespace Tmpl8
                 doorAmount = 9;
                 itenAmount = 27;
 
-                doorX = { tileSize * 3 - tileSize, tileSize * 3 - tileSize, tileSize * 5 - tileSize, tileSize * 7 - tileSize, tileSize * 7 - tileSize, tileSize * 9 - tileSize, tileSize * 9 - tileSize, tileSize * 9 - tileSize, tileSize * 10 - tileSize };
-                doorY = { tileSize * 3 - tileSize, tileSize * 17 - tileSize, tileSize * 10 - tileSize, tileSize * 8 - tileSize, tileSize * 12 - tileSize, tileSize * 5 - tileSize, tileSize * 10 - tileSize, tileSize * 15 - tileSize, tileSize * 10 - tileSize };
-                doorCriteria = { 10, 8, 4, 1, 3, 7, 9, 6, 5 };
-                doorLocked = { true, true, true, true, true, true, true, true, true };
-                doorOpened = { false, false, false, false, false, false, false, false, false };
-                frameOfDoor = { 42, 32, 19, 6, 12, 31, 39, 27, 23 };
+                AddDoorsX({ tileSize * 3 - tileSize, tileSize * 3 - tileSize, tileSize * 5 - tileSize, tileSize * 7 - tileSize, tileSize * 7 - tileSize, tileSize * 9 - tileSize, tileSize * 9 - tileSize, tileSize * 9 - tileSize, tileSize * 10 - tileSize });
+                AddDoorsY({ tileSize * 3 - tileSize, tileSize * 17 - tileSize, tileSize * 10 - tileSize, tileSize * 8 - tileSize, tileSize * 12 - tileSize, tileSize * 5 - tileSize, tileSize * 10 - tileSize, tileSize * 15 - tileSize, tileSize * 10 - tileSize });
+                AddDoorsCriteria({ 10, 8, 4, 1, 3, 7, 9, 6, 5 });
+                AddDoorsLocked({ true, true, true, true, true, true, true, true, true });
+                AddDoorsOpen({ false, false, false, false, false, false, false, false, false });
+                AddDoorsFrame({ 42, 32, 19, 6, 12, 31, 39, 27, 23 });
 
-                itemX = { tileSize * 3 - tileSize, tileSize * 3 - tileSize, tileSize * 7 - tileSize, tileSize * 7 - tileSize, tileSize * 11 - tileSize, tileSize * 11 - tileSize, //keys
+                AddItemsX({ tileSize * 3 - tileSize, tileSize * 3 - tileSize, tileSize * 7 - tileSize, tileSize * 7 - tileSize, tileSize * 11 - tileSize, tileSize * 11 - tileSize, //keys
                     tileSize * 2 - tileSize, tileSize * 2 - tileSize, tileSize * 2 - tileSize, tileSize * 2 - tileSize, tileSize * 2 - tileSize, tileSize * 2 - tileSize, tileSize * 4 - tileSize, tileSize * 4 - tileSize, tileSize * 4 - tileSize, tileSize * 4 - tileSize, tileSize * 4 - tileSize, tileSize * 4 - tileSize, tileSize * 10 - tileSize, tileSize * 10 - tileSize, tileSize * 10 - tileSize, tileSize * 10 - tileSize, tileSize * 12 - tileSize, tileSize * 12 - tileSize, tileSize * 12 - tileSize, tileSize * 12 - tileSize, //coins
-                    tileSize * 12 - tileSize }; //diamond
-                itemY = { tileSize * 5 - tileSize, tileSize * 15 - tileSize, tileSize * 5 - tileSize, tileSize * 15 - tileSize, tileSize * 5 - tileSize, tileSize * 15 - tileSize, //keys
+                    tileSize * 12 - tileSize }); //diamond
+                AddItemsY({ tileSize * 5 - tileSize, tileSize * 15 - tileSize, tileSize * 5 - tileSize, tileSize * 15 - tileSize, tileSize * 5 - tileSize, tileSize * 15 - tileSize, //keys
                     tileSize * 4 - tileSize, tileSize * 6 - tileSize, tileSize * 9 - tileSize, tileSize * 11 - tileSize, tileSize * 14 - tileSize, tileSize * 16 - tileSize, tileSize * 4 - tileSize, tileSize * 6 - tileSize, tileSize * 9 - tileSize, tileSize * 11 - tileSize, tileSize * 14 - tileSize, tileSize * 16 - tileSize, tileSize * 4 - tileSize, tileSize * 6 - tileSize, tileSize * 14 - tileSize, tileSize * 16 - tileSize, tileSize * 4 - tileSize, tileSize * 6 - tileSize, tileSize * 14 - tileSize, tileSize * 16 - tileSize, //coins
-                    tileSize * 10 - tileSize }; // diamond
-                frameOfItem = { 3, 6, 5, 7, 2, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 };
-                itemPickedUp = { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false };
-                itemUsed = { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false };
-                itemHidden = { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false };
+                    tileSize * 10 - tileSize }); // diamond
+                AddItemsFrame({ 3, 6, 5, 7, 2, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 });
+                AddItemsPickedUp({ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false });
+                AddItemsUsed({ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false });
+                AddItemsHidden({ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false });
 
                 mapHeight = 19;
                 mapWidth = 14;
@@ -638,19 +728,19 @@ namespace Tmpl8
                 doorAmount = 10;
                 itenAmount = 8;
 
-                doorX = { tileSize * 7 - tileSize, tileSize * 7 - tileSize, tileSize * 8 - tileSize, tileSize * 9 - tileSize, tileSize * 10 - tileSize, tileSize * 11 - tileSize, tileSize * 12 - tileSize, tileSize * 13 - tileSize, tileSize * 14 - tileSize, tileSize * 15 - tileSize };
-                doorY = { tileSize * 5 - tileSize, tileSize * 5 - tileSize, tileSize * 5 - tileSize, tileSize * 5 - tileSize, tileSize * 5 - tileSize, tileSize * 5 - tileSize, tileSize * 5 - tileSize, tileSize * 5 - tileSize, tileSize * 5 - tileSize, tileSize * 5 - tileSize };
-                doorCriteria = { 4, 6, 10, 3, 1, 9, 8, 7, 2, 5 };
-                doorLocked = { true, true, true, true, true, true, true, true, true, true };
-                doorOpened = { false, false, false, false, false, false, false, false, false, false };
-                frameOfDoor = { 17, 27, 43, 15, 7, 39, 35, 31, 11, 23 };
+                AddDoorsX({ tileSize * 7 - tileSize, tileSize * 7 - tileSize, tileSize * 8 - tileSize, tileSize * 9 - tileSize, tileSize * 10 - tileSize, tileSize * 11 - tileSize, tileSize * 12 - tileSize, tileSize * 13 - tileSize, tileSize * 14 - tileSize, tileSize * 15 - tileSize });
+                AddDoorsY({ tileSize * 5 - tileSize, tileSize * 5 - tileSize, tileSize * 5 - tileSize, tileSize * 5 - tileSize, tileSize * 5 - tileSize, tileSize * 5 - tileSize, tileSize * 5 - tileSize, tileSize * 5 - tileSize, tileSize * 5 - tileSize, tileSize * 5 - tileSize });
+                AddDoorsCriteria({ 4, 6, 10, 3, 1, 9, 8, 7, 2, 5 });
+                AddDoorsLocked({ true, true, true, true, true, true, true, true, true, true });
+                AddDoorsOpen({ false, false, false, false, false, false, false, false, false, false });
+                AddDoorsFrame({ 17, 27, 43, 15, 7, 39, 35, 31, 11, 23 });
 
-                itemX = { tileSize * 2 - tileSize, tileSize * 2 - tileSize, tileSize * 2 - tileSize, tileSize * 2 - tileSize, tileSize * 2 - tileSize, tileSize * 2 - tileSize, tileSize * 2 - tileSize, tileSize * 17 - tileSize };
-                itemY = { tileSize * 2 - tileSize, tileSize * 3 - tileSize, tileSize * 4 - tileSize, tileSize * 5 - tileSize, tileSize * 6 - tileSize, tileSize * 7 - tileSize, tileSize * 8 - tileSize, tileSize * 5 - tileSize };
-                frameOfItem = { 2, 0, 7, 3, 6, 4, 5, 1 };
-                itemPickedUp = { false, false, false, false, false, false, false, false };
-                itemUsed = { false, false, false, false, false, false, false, false };
-                itemHidden = { false, false, false, false, false, false, false, false };
+                AddItemsX({ tileSize * 2 - tileSize, tileSize * 2 - tileSize, tileSize * 2 - tileSize, tileSize * 2 - tileSize, tileSize * 2 - tileSize, tileSize * 2 - tileSize, tileSize * 2 - tileSize, tileSize * 17 - tileSize });
+                AddItemsY({ tileSize * 2 - tileSize, tileSize * 3 - tileSize, tileSize * 4 - tileSize, tileSize * 5 - tileSize, tileSize * 6 - tileSize, tileSize * 7 - tileSize, tileSize * 8 - tileSize, tileSize * 5 - tileSize });
+                AddItemsFrame({ 2, 0, 7, 3, 6, 4, 5, 1 });
+                AddItemsPickedUp({ false, false, false, false, false, false, false, false });
+                AddItemsUsed({ false, false, false, false, false, false, false, false });
+                AddItemsHidden({ false, false, false, false, false, false, false, false });
 
                 mapHeight = 9;
                 mapWidth = 19;
@@ -683,19 +773,19 @@ namespace Tmpl8
                 doorAmount = 15;
                 itenAmount = 9;
 
-                doorX = { tileSize * 4 - tileSize, tileSize * 4 - tileSize, tileSize * 5 - tileSize, tileSize * 7 - tileSize, tileSize * 8 - tileSize, tileSize * 9 - tileSize, tileSize * 9 - tileSize, tileSize * 11 - tileSize, tileSize * 11 - tileSize, tileSize * 13 - tileSize, tileSize * 13 - tileSize, tileSize * 13 - tileSize, tileSize * 17 - tileSize, tileSize * 18 - tileSize, tileSize * 18 - tileSize };
-                doorY = { tileSize * 4 - tileSize, tileSize * 10 - tileSize, tileSize * 7 - tileSize, tileSize * 7 - tileSize, tileSize * 14 - tileSize, tileSize * 7 - tileSize, tileSize * 12 - tileSize, tileSize * 9 - tileSize, tileSize * 11 - tileSize, tileSize * 7 - tileSize, tileSize * 12 - tileSize, tileSize * 15 - tileSize, tileSize * 7 - tileSize, tileSize * 4 - tileSize, tileSize * 10 - tileSize };
-                doorCriteria = { 2, 1, 4, 5, 3, 6, 8, 9, 1, 6, 7, 10, 2, 4, 3};
-                doorLocked = { true, true, true, true, true, true, true, true, true, true, true, true, true, true, true };
-                doorOpened = { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false };
-                frameOfDoor = { 9, 5, 17, 21, 14, 25, 33, 38, 6, 27, 31, 41, 11, 19, 15 };
+                AddDoorsX({ tileSize * 4 - tileSize, tileSize * 4 - tileSize, tileSize * 5 - tileSize, tileSize * 7 - tileSize, tileSize * 8 - tileSize, tileSize * 9 - tileSize, tileSize * 9 - tileSize, tileSize * 11 - tileSize, tileSize * 11 - tileSize, tileSize * 13 - tileSize, tileSize * 13 - tileSize, tileSize * 13 - tileSize, tileSize * 17 - tileSize, tileSize * 18 - tileSize, tileSize * 18 - tileSize });
+                AddDoorsY({ tileSize * 4 - tileSize, tileSize * 10 - tileSize, tileSize * 7 - tileSize, tileSize * 7 - tileSize, tileSize * 14 - tileSize, tileSize * 7 - tileSize, tileSize * 12 - tileSize, tileSize * 9 - tileSize, tileSize * 11 - tileSize, tileSize * 7 - tileSize, tileSize * 12 - tileSize, tileSize * 15 - tileSize, tileSize * 7 - tileSize, tileSize * 4 - tileSize, tileSize * 10 - tileSize });
+                AddDoorsCriteria({ 2, 1, 4, 5, 3, 6, 8, 9, 1, 6, 7, 10, 2, 4, 3});
+                AddDoorsLocked({ true, true, true, true, true, true, true, true, true, true, true, true, true, true, true });
+                AddDoorsOpen({ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false });
+                AddDoorsFrame({ 9, 5, 17, 21, 14, 25, 33, 38, 6, 27, 31, 41, 11, 19, 15 });
 
-                itemX = { tileSize * 2 - tileSize, tileSize * 2 - tileSize, tileSize * 4 - tileSize, tileSize * 11 - tileSize, tileSize * 18 - tileSize, tileSize * 20 - tileSize, tileSize * 20 - tileSize, tileSize * 9 - tileSize, tileSize * 11 - tileSize };
-                itemY = { tileSize * 6 - tileSize, tileSize * 8 - tileSize, tileSize * 7 - tileSize, tileSize * 7 - tileSize, tileSize * 7 - tileSize, tileSize * 6 - tileSize, tileSize * 8 - tileSize, tileSize * 15 - tileSize, tileSize * 15 - tileSize };
-                frameOfItem = { 4, 5, 7, 3, 2, 3, 6, 0, 1 };
-                itemPickedUp = { false, false, false, false, false, false, false, false, false };
-                itemUsed = { false, false, false, false, false, false, false, false, false };
-                itemHidden = { false, false, false, false, false, false, false, false, false };
+                AddItemsX({ tileSize * 2 - tileSize, tileSize * 2 - tileSize, tileSize * 4 - tileSize, tileSize * 11 - tileSize, tileSize * 18 - tileSize, tileSize * 20 - tileSize, tileSize * 20 - tileSize, tileSize * 9 - tileSize, tileSize * 11 - tileSize });
+                AddItemsY({ tileSize * 6 - tileSize, tileSize * 8 - tileSize, tileSize * 7 - tileSize, tileSize * 7 - tileSize, tileSize * 7 - tileSize, tileSize * 6 - tileSize, tileSize * 8 - tileSize, tileSize * 15 - tileSize, tileSize * 15 - tileSize });
+                AddItemsFrame({ 4, 5, 7, 3, 2, 3, 6, 0, 1 });
+                AddItemsPickedUp({ false, false, false, false, false, false, false, false, false });
+                AddItemsUsed({ false, false, false, false, false, false, false, false, false });
+                AddItemsHidden({ false, false, false, false, false, false, false, false, false });
 
                 mapHeight = 17;
                 mapWidth = 21;
@@ -736,39 +826,39 @@ namespace Tmpl8
                 doorAmount = 30;
                 itenAmount = 34;
 
-                doorX = { tileSize * 5 - tileSize, tileSize * 7 - tileSize, //red
+                AddDoorsX({ tileSize * 5 - tileSize, tileSize * 7 - tileSize, //red
                     tileSize * 4 - tileSize, tileSize * 6 - tileSize, tileSize * 8 - tileSize, //blue
                     tileSize * 3 - tileSize, tileSize * 5 - tileSize, tileSize * 7 - tileSize, tileSize * 9 - tileSize, //purple
                     tileSize * 15 - tileSize, tileSize * 17 - tileSize, tileSize * 19 - tileSize, tileSize * 21 - tileSize, tileSize * 23 - tileSize, //yellow
                     tileSize * 14 - tileSize, tileSize * 16 - tileSize, tileSize * 18 - tileSize, tileSize * 20 - tileSize, tileSize * 22 - tileSize, tileSize * 24 - tileSize, //white
                     tileSize * 13 - tileSize, tileSize * 15 - tileSize, tileSize * 17 - tileSize, tileSize * 19 - tileSize, tileSize * 21 - tileSize, tileSize * 23 - tileSize, tileSize * 25 - tileSize, //black
-                    tileSize * 8 - tileSize, tileSize * 10 - tileSize, tileSize * 11 - tileSize }; //secret
-                doorY = { tileSize * 10 - tileSize, tileSize * 10 - tileSize, //red
+                    tileSize * 8 - tileSize, tileSize * 10 - tileSize, tileSize * 11 - tileSize }); //secret
+                AddDoorsY({ tileSize * 10 - tileSize, tileSize * 10 - tileSize, //red
                     tileSize * 17 - tileSize, tileSize * 17 - tileSize, tileSize * 17 - tileSize, //blue
                     tileSize * 24 - tileSize, tileSize * 24 - tileSize, tileSize * 24 - tileSize, tileSize * 24 - tileSize, //purple
                     tileSize * 20 - tileSize, tileSize * 20 - tileSize, tileSize * 20 - tileSize, tileSize * 20 - tileSize, tileSize * 20 - tileSize, //yellow
                     tileSize * 13 - tileSize, tileSize * 13 - tileSize, tileSize * 13 - tileSize, tileSize * 13 - tileSize, tileSize * 13 - tileSize, tileSize * 13 - tileSize, //white
                     tileSize * 6 - tileSize, tileSize * 6 - tileSize, tileSize * 6 - tileSize, tileSize * 6 - tileSize, tileSize * 6 - tileSize, tileSize * 6 - tileSize, tileSize * 6 - tileSize, //black
-                    tileSize * 3 - tileSize, tileSize * 15 - tileSize, tileSize * 22 - tileSize }; //secret
-                doorCriteria = { 5, 5, 6, 6, 6, 8, 8, 8, 8, 7, 7, 7, 7, 7, 10, 10, 10, 10, 10, 10, 9, 9, 9, 9, 9, 9, 9, 4, 2, 3 };
-                doorLocked = { true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true };
-                doorOpened = { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false };
-                doorHidden = { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, true, true };
-                frameOfDoor = { 22, 22, 26, 26, 26, 34, 34, 34, 34, 28, 28, 28, 28, 28, 40, 40, 40, 40, 40, 40, 36, 36, 36, 36, 36, 36, 36, 17, 9, 13 };
+                    tileSize * 3 - tileSize, tileSize * 15 - tileSize, tileSize * 22 - tileSize }); //secret
+                AddDoorsCriteria({ 5, 5, 6, 6, 6, 8, 8, 8, 8, 7, 7, 7, 7, 7, 10, 10, 10, 10, 10, 10, 9, 9, 9, 9, 9, 9, 9, 4, 2, 3 });
+                AddDoorsLocked({ true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true });
+                AddDoorsOpen({ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false });
+                AddDoorsHidden({ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, true, true });
+                AddDoorsFrame({ 22, 22, 26, 26, 26, 34, 34, 34, 34, 28, 28, 28, 28, 28, 40, 40, 40, 40, 40, 40, 36, 36, 36, 36, 36, 36, 36, 17, 9, 13 });
 
-                itemX = { tileSize * 6 - tileSize, tileSize * 6 - tileSize, tileSize * 6 - tileSize, tileSize * 19 - tileSize, tileSize * 19 - tileSize, tileSize * 19 - tileSize, //keys
+                AddItemsX({ tileSize * 6 - tileSize, tileSize * 6 - tileSize, tileSize * 6 - tileSize, tileSize * 19 - tileSize, tileSize * 19 - tileSize, tileSize * 19 - tileSize, //keys
                     tileSize * 5 - tileSize, tileSize * 11 - tileSize, tileSize * 16 - tileSize, tileSize * 19 - tileSize, tileSize * 27 - tileSize, tileSize * 28 - tileSize, tileSize * 28 - tileSize, tileSize * 28 - tileSize, tileSize * 28 - tileSize, //coins
                     tileSize * 28 - tileSize, //diamond
-                    tileSize * 12 - tileSize, tileSize * 13 - tileSize, tileSize * 10 - tileSize, tileSize * 10 - tileSize, tileSize * 10 - tileSize, tileSize * 10 - tileSize, tileSize * 10 - tileSize, tileSize * 10 - tileSize, tileSize * 10 - tileSize, tileSize * 10 - tileSize, tileSize * 10 - tileSize, tileSize * 10 - tileSize, tileSize * 10 - tileSize, tileSize * 11 - tileSize, tileSize * 11 - tileSize, tileSize * 11 - tileSize, tileSize * 12 - tileSize, tileSize * 12 - tileSize }; //secret
-                itemY = { tileSize * 8 - tileSize, tileSize * 15 - tileSize, tileSize * 22 - tileSize, tileSize * 8 - tileSize, tileSize * 15 - tileSize, tileSize * 22 - tileSize, //keys
+                    tileSize * 12 - tileSize, tileSize * 13 - tileSize, tileSize * 10 - tileSize, tileSize * 10 - tileSize, tileSize * 10 - tileSize, tileSize * 10 - tileSize, tileSize * 10 - tileSize, tileSize * 10 - tileSize, tileSize * 10 - tileSize, tileSize * 10 - tileSize, tileSize * 10 - tileSize, tileSize * 10 - tileSize, tileSize * 10 - tileSize, tileSize * 11 - tileSize, tileSize * 11 - tileSize, tileSize * 11 - tileSize, tileSize * 12 - tileSize, tileSize * 12 - tileSize }); //secret
+                AddItemsY({ tileSize * 8 - tileSize, tileSize * 15 - tileSize, tileSize * 22 - tileSize, tileSize * 8 - tileSize, tileSize * 15 - tileSize, tileSize * 22 - tileSize, //keys
                     tileSize * 29 - tileSize, tileSize * 29 - tileSize, tileSize * 29 - tileSize, tileSize * 27 - tileSize, tileSize * 2 - tileSize, tileSize * 6 - tileSize, tileSize * 11 - tileSize, tileSize * 15 - tileSize, tileSize * 20 - tileSize, //coins
                     tileSize * 27 - tileSize, //diamond
-                    tileSize * 12 - tileSize, tileSize * 2 - tileSize, tileSize * 2 - tileSize, tileSize * 3 - tileSize, tileSize * 4 - tileSize, tileSize * 5 - tileSize, tileSize * 6 - tileSize, tileSize * 7 - tileSize, tileSize * 8 - tileSize, tileSize * 9 - tileSize, tileSize * 10 - tileSize, tileSize * 11 - tileSize, tileSize * 12 - tileSize, tileSize * 2 - tileSize, tileSize * 11 - tileSize, tileSize * 12 - tileSize, tileSize * 2 - tileSize, tileSize * 11 - tileSize }; //secret
-                frameOfItem = { 2, 3, 5, 6, 7, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, //visible
-                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0 }; //secret
-                itemPickedUp = { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false };
-                itemUsed = { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false };
-                itemHidden = { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true };
+                    tileSize * 12 - tileSize, tileSize * 2 - tileSize, tileSize * 2 - tileSize, tileSize * 3 - tileSize, tileSize * 4 - tileSize, tileSize * 5 - tileSize, tileSize * 6 - tileSize, tileSize * 7 - tileSize, tileSize * 8 - tileSize, tileSize * 9 - tileSize, tileSize * 10 - tileSize, tileSize * 11 - tileSize, tileSize * 12 - tileSize, tileSize * 2 - tileSize, tileSize * 11 - tileSize, tileSize * 12 - tileSize, tileSize * 2 - tileSize, tileSize * 11 - tileSize }); //secret
+                AddItemsFrame({ 2, 3, 5, 6, 7, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, //visible
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0 }); //secret
+                AddItemsPickedUp({ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false });
+                AddItemsUsed({ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false });
+                AddItemsHidden({ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true });
 
                 mapHeight = 30;
                 mapWidth = 30;
@@ -822,23 +912,23 @@ namespace Tmpl8
                 doorAmount = 3;
                 itenAmount = 28;
 
-                doorX = { tileSize * 24 - tileSize, tileSize * 28 - tileSize, tileSize * 28 - tileSize };
-                doorY = { tileSize * 17 - tileSize, tileSize * 25 - tileSize, tileSize * 26 - tileSize };
-                doorCriteria = { 10, 6, 5 };
-                doorLocked = { true, true, true };
-                doorOpened = { false, false, false };
-                frameOfDoor = { 40, 26, 22 };
+                AddDoorsX({ tileSize * 24 - tileSize, tileSize * 28 - tileSize, tileSize * 28 - tileSize });
+                AddDoorsY({ tileSize * 17 - tileSize, tileSize * 25 - tileSize, tileSize * 26 - tileSize });
+                AddDoorsCriteria({ 10, 6, 5 });
+                AddDoorsLocked({ true, true, true });
+                AddDoorsOpen({ false, false, false });
+                AddDoorsFrame({ 40, 26, 22 });
 
-                itemX = { tileSize * 14 - tileSize, tileSize * 27 - tileSize, tileSize * 29 - tileSize, //keys
+                AddItemsX({ tileSize * 14 - tileSize, tileSize * 27 - tileSize, tileSize * 29 - tileSize, //keys
                     tileSize * 22 - tileSize, tileSize * 22 - tileSize, tileSize * 22 - tileSize, tileSize * 22 - tileSize, tileSize * 23 - tileSize, tileSize * 23 - tileSize, tileSize * 23 - tileSize, tileSize * 23 - tileSize, tileSize * 24 - tileSize, tileSize * 24 - tileSize, tileSize * 24 - tileSize, tileSize * 24 - tileSize, tileSize * 25 - tileSize, tileSize * 25 - tileSize, tileSize * 25 - tileSize, tileSize * 25 - tileSize, tileSize * 26 - tileSize, tileSize * 26 - tileSize, tileSize * 26 - tileSize, tileSize * 26 - tileSize, tileSize * 27 - tileSize, tileSize * 27 - tileSize, tileSize * 27 - tileSize, tileSize * 27 - tileSize, //coins
-                    tileSize * 28 - tileSize }; //diamond
-                itemY = { tileSize * 25 - tileSize, tileSize * 10 - tileSize, tileSize * 6 - tileSize, //keys
+                    tileSize * 28 - tileSize }); //diamond
+                AddItemsY({ tileSize * 25 - tileSize, tileSize * 10 - tileSize, tileSize * 6 - tileSize, //keys
                     tileSize * 13 - tileSize, tileSize * 14 - tileSize, tileSize * 15 - tileSize, tileSize * 16 - tileSize, tileSize * 13 - tileSize, tileSize * 14 - tileSize, tileSize * 15 - tileSize, tileSize * 16 - tileSize, tileSize * 13 - tileSize, tileSize * 14 - tileSize, tileSize * 15 - tileSize, tileSize * 16 - tileSize, tileSize * 13 - tileSize, tileSize * 14 - tileSize, tileSize * 15 - tileSize, tileSize * 16 - tileSize, tileSize * 13 - tileSize, tileSize * 14 - tileSize, tileSize * 15 - tileSize, tileSize * 16 - tileSize, tileSize * 13 - tileSize, tileSize * 14 - tileSize, tileSize * 15 - tileSize, tileSize * 16 - tileSize, 
-                    tileSize * 28 - tileSize};
-                frameOfItem = { 3, 7, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 };
-                itemPickedUp = { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false };
-                itemUsed = { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false };
-                itemHidden = { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false };
+                    tileSize * 28 - tileSize});
+                AddItemsFrame({ 3, 7, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 });
+                AddItemsPickedUp({ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false });
+                AddItemsUsed({ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false });
+                AddItemsHidden({ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false });
 
                 mapHeight = 30;
                 mapWidth = 30;
@@ -892,12 +982,12 @@ namespace Tmpl8
                 doorAmount = 0;
                 itenAmount = 5;
 
-                itemX = { tileSize * 27 - tileSize, tileSize * 27 - tileSize, tileSize * 29 - tileSize, tileSize * 29 - tileSize, tileSize * 28 - tileSize };
-                itemY = { tileSize * 2 - tileSize, tileSize * 4 - tileSize, tileSize * 2 - tileSize, tileSize * 4 - tileSize, tileSize * 3 - tileSize };
-                frameOfItem = { 0, 0, 0, 0, 1 };
-                itemPickedUp = { false, false, false, false, false };
-                itemUsed = { false, false, false, false, false };
-                itemHidden = { false, false, false, false, false };
+                AddItemsX({ tileSize * 27 - tileSize, tileSize * 27 - tileSize, tileSize * 29 - tileSize, tileSize * 29 - tileSize, tileSize * 28 - tileSize });
+                AddItemsY({ tileSize * 2 - tileSize, tileSize * 4 - tileSize, tileSize * 2 - tileSize, tileSize * 4 - tileSize, tileSize * 3 - tileSize });
+                AddItemsFrame({ 0, 0, 0, 0, 1 });
+                AddItemsPickedUp({ false, false, false, false, false });
+                AddItemsUsed({ false, false, false, false, false });
+                AddItemsHidden({ false, false, false, false, false });
 
                 mapHeight = 5;
                 mapWidth = 30;
@@ -965,28 +1055,28 @@ namespace Tmpl8
         {
             for (int i = 0; i < doorAmount; i++)
             {
-                if (doorLocked[1] == false)
+                if (doors[1].locked == false)
                 {
                     map[12] = "aax aax aax aax abx aax ab- aax aax aax aax aax aax ab- aax ab- aax ab- aax ab- aax ab- aax ab- aax aax aax ab- aax aax";
                     map[13] = "aax aax ad- ac- ac- ac- dg- ac- dd- aax aax aax ad- dg- ac- dg- ac- dg- ac- dg- ac- dg- ac- dg- dd- aax aax ab- aax aax";
                 }
-                if (doorLocked[4] == false)
+                if (doors[4].locked == false)
                 {
                     map[19] = "aax aax aax abx aax abx aax ab- aax aax aax aax aax aax ab- aax ab- aax ab- aax ab- aax ab- aax aax aax aax ab- aax aax";
                     map[20] = "aax ad- ac- ac- ac- ac- ac- dg- ac- dd- aax aax aax ad- dg- ac- dg- ac- dg- ac- dg- ac- dg- dd- aax aax aax ab- aax aax";
                 }
-                if (doorLocked[11] == false)
+                if (doors[11].locked == false)
                 {
                     map[15] = "aax aax bd- bg- cc- bg- cc- bg- cd- aax aax aax bd- cc- cc- cc- cc- cc- bg- cc- cc- cc- cc- cc- cd- aax aax ab- aax aax";
                     map[16] = "aax aax aax ab- aax ab- aax ab- aax aax aax aax aax aax abx aax abx aax ab- aax abx aax abx aax aax aax aax ab- aax aax";
                 }
-                if (doorLocked[15] == false)
+                if (doors[15].locked == false)
                 {
                     map[8] = "aax aax aax bd- bg- cc- bg- cd- aax aax aax bd- cc- cc- cc- bg- cc- cc- cc- cc- cc- cc- cc- cc- cc- cd- aax ab- aax aax";
                     map[9] = "aax aax aax aax ab- aax ab- aax aax aax aax aax aax abx aax ab- aax abx aax abx aax abx aax abx aax aax aax ab- aax aax";
                 }
 
-                if (doorLocked[20] == false)
+                if (doors[20].locked == false)
                 {
                     map[1] = "aax aax aax aax ad- ac- dd- aax aax ad- bb- bb- dd- aax de- aax de- aax de- aax de- aax de- aax ad- bb- bb- dd- aax aax";
                     map[2] = "aax aax aax aax bc- aa- dc- aax aax ab- aax aax ab- aax ab- aax ab- aax ab- aax ab- aax ab- aax ab- aax aax ab- aax aax";
@@ -999,11 +1089,11 @@ namespace Tmpl8
                     map[9] = "aax aax aax aax ab- aax ab- aax aax ab- aax aax aax abx aax ab- aax abx aax abx aax abx aax abx aax aax aax ab- aax aax";
                     map[10] = "aax aax aax aax ab- aax ab- aax aax bc- ac- dd- aax ab- aax ab- aax ab- aax ab- aax ab- aax ab- aax aax aax ab- aax aax";
                     map[11] = "aax aax aax aax ab- aax ab- aax aax bd- cc- cd- aax ab- aax ab- aax ab- aax ab- aax ab- aax ab- aax aax aax ab- aax aax";
-                    for (int j = 16; j <= 33; j++) { itemHidden[j] = false; }
+                    for (int j = 16; j <= 33; j++) { items[j].hidden = false; }
                 }
-                if (doorLocked[27] == false)
+                if (doors[27].locked == false)
                 {
-                    doorHidden[27] = false;
+                    doors[27].hidden = false;
                     map[1] = "aax aax aax aax ad- ac- dd- aax aax ad- bb- bb- dd- aax de- aax de- aax de- aax de- aax de- aax ad- bb- bb- dd- aax aax";
                     map[2] = "aax aax aax aax bc- aa- cg- bb- bb- dc- aax aax ab- aax ab- aax ab- aax ab- aax ab- aax ab- aax ab- aax aax ab- aax aax";
                     map[3] = "aax aax aax aax bd- bg- cd- aax aax ab- aax aax ab- aax ab- aax ab- aax ab- aax ab- aax ab- aax ab- aax aax ab- aax aax";
@@ -1015,33 +1105,33 @@ namespace Tmpl8
                     map[9] = "aax aax aax aax ab- aax ab- aax aax ab- aax aax aax abx aax ab- aax abx aax abx aax abx aax abx aax aax aax ab- aax aax";
                     map[10] = "aax aax aax aax ab- aax ab- aax aax bc- ac- dd- aax ab- aax ab- aax ab- aax ab- aax ab- aax ab- aax aax aax ab- aax aax";
                     map[11] = "aax aax aax aax ab- aax ab- aax aax bd- cc- cd- aax ab- aax ab- aax ab- aax ab- aax ab- aax ab- aax aax aax ab- aax aax";
-                    for (int j = 16; j <= 33; j++) { itemHidden[j] = false; }
-                    if (doorLocked[20] == true) frameOfDoor[20] = 38;
+                    for (int j = 16; j <= 33; j++) { items[j].hidden = false; }
+                    if (doors[20].locked == true) doors[20].frame = 38;
                 }
-                if (doorLocked[28] == false)
+                if (doors[28].locked == false)
                 {
-                    doorHidden[28] = false;
+                    doors[28].hidden = false;
                     map[14] = "aax aax bc- aa- aa- aa- aa- aa- cg- bb- bb- bb- ag- aa- aa- aa- aa- aa- aa- aa- aa- aa- aa- aa- dc- aax aax ab- aax aax";
                 }
-                else if(doorLocked[28] == true)
+                else if(doors[28].locked == true)
                 {
-                    doorHidden[28] = true;
+                    doors[28].hidden = true;
                     map[14] = "aax aax bc- aa- aa- aa- aa- aa- dc- aax aax aax bc- aa- aa- aa- aa- aa- aa- aa- aa- aa- aa- aa- dc- aax aax ab- aax aax";
                 }
-                if (doorLocked[29] == false)
+                if (doors[29].locked == false)
                 {
-                    doorHidden[29] = false;
+                    doors[29].hidden = false;
                     map[21] = "aax bc- aa- aa- aa- aa- aa- aa- aa- cg- bb- bb- bb- ag- aa- aa- aa- aa- aa- aa- aa- aa- aa- dc- aax aax aax ab- aax aax";
                 }
-                else if(doorLocked[29] == true)
+                else if(doors[29].locked == true)
                 {
-                    doorHidden[29] = true;
+                    doors[29].hidden = true;
                     map[21] = "aax bc- aa- aa- aa- aa- aa- aa- aa- dc- aax aax aax bc- aa- aa- aa- aa- aa- aa- aa- aa- aa- dc- aax aax aax ab- aax aax";
                 }
-                if (doorLocked[20] == true && doorLocked[27] == true && doorLocked[28] == true && doorLocked[29] == true && doorLocked[15] == false)
+                if (doors[20].locked == true && doors[27].locked == true && doors[28].locked == true && doors[29].locked == true && doors[15].locked == false)
                 {
-                    doorHidden[27] = true, doorHidden[28] = true, doorHidden[29] = true;
-                    doorLocked[27] = true, doorLocked[28] = true, doorLocked[29] = true;
+                    doors[27].hidden = true, doors[28].hidden = true, doors[29].hidden = true;
+                    doors[27].locked = true, doors[28].locked = true, doors[29].locked = true;
                     map[1] = "aax aax aax aax ad- ac- dd- aax aax aax aax aax aax aax de- aax de- aax de- aax de- aax de- aax ad- bb- bb- dd- aax aax";
                     map[2] = "aax aax aax aax bc- aa- dc- aax aax aax aax aax ab- aax ab- aax ab- aax ab- aax ab- aax ab- aax ab- aax aax ab- aax aax";
                     map[3] = "aax aax aax aax bd- bg- cd- aax aax aax aax aax ab- aax ab- aax ab- aax ab- aax ab- aax ab- aax ab- aax aax ab- aax aax";
@@ -1055,13 +1145,13 @@ namespace Tmpl8
                     map[11] = "aax aax aax aax ab- aax ab- aax aax aax aax aax aax ab- aax ab- aax ab- aax ab- aax ab- aax ab- aax aax aax ab- aax aax";
                     map[14] = "aax aax bc- aa- aa- aa- aa- aa- dc- aax aax aax bc- aa- aa- aa- aa- aa- aa- aa- aa- aa- aa- aa- dc- aax aax ab- aax aax";
                     map[21] = "aax bc- aa- aa- aa- aa- aa- aa- aa- dc- aax aax aax bc- aa- aa- aa- aa- aa- aa- aa- aa- aa- dc- aax aax aax ab- aax aax";
-                    for (int j = 16; j <= 33; j++) { itemHidden[j] = true; }
-                    if (doorLocked[20] == true) frameOfDoor[20] = 36;
+                    for (int j = 16; j <= 33; j++) { items[j].hidden = true; }
+                    if (doors[20].locked == true) doors[20].frame = 36;
                 }
-                if(doorLocked[20] == true && doorLocked[27] == true && doorLocked[28] == true && doorLocked[29] == true && doorLocked[15] == true)
+                if(doors[20].locked == true && doors[27].locked == true && doors[28].locked == true && doors[29].locked == true && doors[15].locked == true)
                 {
-                    doorHidden[27] = true, doorHidden[28] = true, doorHidden[29] = true;
-                    doorLocked[27] = true, doorLocked[28] = true, doorLocked[29] = true;
+                    doors[27].hidden = true, doors[28].hidden = true, doors[29].hidden = true;
+                    doors[27].locked = true, doors[28].hidden = true, doors[29].hidden = true;
                     map[1] = "aax aax aax aax ad- ac- dd- aax aax aax aax aax aax aax de- aax de- aax de- aax de- aax de- aax ad- bb- bb- dd- aax aax";
                     map[2] = "aax aax aax aax bc- aa- dc- aax aax aax aax aax ab- aax ab- aax ab- aax ab- aax ab- aax ab- aax ab- aax aax ab- aax aax";
                     map[3] = "aax aax aax aax bd- bg- cd- aax aax aax aax aax ab- aax ab- aax ab- aax ab- aax ab- aax ab- aax ab- aax aax ab- aax aax";
@@ -1075,10 +1165,10 @@ namespace Tmpl8
                     map[11] = "aax aax aax aax ab- aax ab- aax aax aax aax aax aax ab- aax ab- aax ab- aax ab- aax ab- aax ab- aax aax aax ab- aax aax";
                     map[14] = "aax aax bc- aa- aa- aa- aa- aa- dc- aax aax aax bc- aa- aa- aa- aa- aa- aa- aa- aa- aa- aa- aa- dc- aax aax ab- aax aax";
                     map[21] = "aax bc- aa- aa- aa- aa- aa- aa- aa- dc- aax aax aax bc- aa- aa- aa- aa- aa- aa- aa- aa- aa- dc- aax aax aax ab- aax aax";
-                    for (int j = 16; j <= 33; j++) { itemHidden[j] = true; }
-                    if (doorLocked[20] == true) frameOfDoor[20] = 36;
+                    for (int j = 16; j <= 33; j++) { items[j].hidden = true; }
+                    if (doors[20].locked == true) doors[20].frame = 36;
                 }
-                if (doorLocked[27] == true) doorHidden[27] = true;
+                if (doors[27].locked == true) doors[27].hidden = true;
             }
             checkDoor(px, py);
         }
@@ -1094,27 +1184,27 @@ namespace Tmpl8
         //doors creation
         for (int i = 0; i < doorAmount; i++)
         {
-            //if (doorX[i] + startmidX >= screen->GetWidth() - tileSize || doorX[i] + startmidX < 0 || doorY[i] + startmidY >= screen->GetHeight() - tileSize || doorY[i] + startmidY < 0) continue;
-            if (level != 8 || level == 8 && doorHidden[i] == false)
+            //if (doors[i].x + startmidX >= screen->GetWidth() - tileSize || doors[i].x + startmidX < 0 || doors[i].y + startmidY >= screen->GetHeight() - tileSize || doors[i].y + startmidY < 0) continue;
+            if (level != 8 || level == 8 && doors[i].hidden == false)
             {
-                doors.SetFrame(frameOfDoor[i]);
-                doors.Draw(screen, doorX[i] - plx + startmidX, doorY[i] - ply + startmidY);
+                doorsSprite.SetFrame(doors[i].frame);
+                doorsSprite.Draw(screen, doors[i].x - plx + startmidX, doors[i].y - ply + startmidY);
             }
         }
 
         /*for (int i = 0; i < doorAmount; i++)
         {
-            doors.SetFrame(frameOfDoor[i]);
-            doors.Draw(screen, doorX[i] - plx + startmidX, dY[i] - ply + startmidY);
+            doorsSprite.SetFrame(doors[i].frame);
+            doorsSprite.Draw(screen, doors[i].x - plx + startmidX, dY[i] - ply + startmidY);
         }*/
 
         //item creation
         for (int i = 0; i < itenAmount; i++)
         {
-            if (itemPickedUp[i] == false && itemUsed[i] == false && itemHidden[i] == false)
+            if (items[i].pickedUp == false && items[i].used == false && items[i].hidden == false)
             {
-                items.SetFrame(frameOfItem[i]);
-                items.Draw(screen, itemX[i] - plx + startmidX, itemY[i] - ply + startmidY);
+                itemsSprite.SetFrame(items[i].frame);
+                itemsSprite.Draw(screen, items[i].x - plx + startmidX, items[i].y - ply + startmidY);
             }
         }
 
@@ -1123,8 +1213,8 @@ namespace Tmpl8
         {
             if (tutorialHidden[i] == false)
             {
-                tutorial.SetFrame(i);
-                tutorial.Draw(screen, tutorialX[i] - plx + startmidX, tutorialY[i] - ply + startmidY);
+                tutorialSprite.SetFrame(i);
+                tutorialSprite.Draw(screen, tutorialX[i] - plx + startmidX, tutorialY[i] - ply + startmidY);
             }
         }
 
@@ -1138,13 +1228,13 @@ namespace Tmpl8
         for (int i = 0; i < 10; i++) { tutorialHidden[i] = true; }
         if (level == 0)
         {
-            if (px >= tileSize * 2 - tileSize && px <= tileSize * 5 - tileSize && py >= tileSize * 5 - tileSize && py <= tileSize * 8 - tileSize && doorLocked[3] == true) tutorialHidden[6] = false;
-            if (px >= tileSize * 3 - tileSize && px <= tileSize * 4 - tileSize && py >= tileSize * 4 - tileSize && py <= tileSize * 7 - tileSize && doorLocked[3] == true) tutorialHidden[0] = false;
-            if (px >= tileSize * 3 - tileSize && px <= tileSize * 4 - tileSize && py >= tileSize * 4 - tileSize && py <= tileSize * 7 - tileSize && doorLocked[3] == true) tutorialHidden[1] = false;
-            if (px >= tileSize * 4 - tileSize && px <= tileSize * 6 - tileSize && py >= tileSize * 2 - tileSize && py <= tileSize * 3 - tileSize && doorLocked[3] == true) tutorialHidden[2] = false;
-            if (px >= tileSize * 7 - tileSize && px <= tileSize * 8 - tileSize && py >= tileSize * 3 - tileSize && py <= tileSize * 5 - tileSize && doorLocked[3] == true) tutorialHidden[3] = false;
-            if (px >= tileSize * 5 - tileSize && px <= tileSize * 7 - tileSize && py >= tileSize * 6 - tileSize && py <= tileSize * 7 - tileSize && doorLocked[3] == true) tutorialHidden[4] = false;
-            if (px >= tileSize * 2 - tileSize && px <= tileSize * 5 - tileSize && py >= tileSize * 5 - tileSize && py <= tileSize * 8 - tileSize && doorLocked[3] == false) tutorialHidden[5] = false;
+            if (px >= tileSize * 2 - tileSize && px <= tileSize * 5 - tileSize && py >= tileSize * 5 - tileSize && py <= tileSize * 8 - tileSize && doors[3].locked == true) tutorialHidden[6] = false;
+            if (px >= tileSize * 3 - tileSize && px <= tileSize * 4 - tileSize && py >= tileSize * 4 - tileSize && py <= tileSize * 7 - tileSize && doors[3].locked == true) tutorialHidden[0] = false;
+            if (px >= tileSize * 3 - tileSize && px <= tileSize * 4 - tileSize && py >= tileSize * 4 - tileSize && py <= tileSize * 7 - tileSize && doors[3].locked == true) tutorialHidden[1] = false;
+            if (px >= tileSize * 4 - tileSize && px <= tileSize * 6 - tileSize && py >= tileSize * 2 - tileSize && py <= tileSize * 3 - tileSize && doors[3].locked == true) tutorialHidden[2] = false;
+            if (px >= tileSize * 7 - tileSize && px <= tileSize * 8 - tileSize && py >= tileSize * 3 - tileSize && py <= tileSize * 5 - tileSize && doors[3].locked == true) tutorialHidden[3] = false;
+            if (px >= tileSize * 5 - tileSize && px <= tileSize * 7 - tileSize && py >= tileSize * 6 - tileSize && py <= tileSize * 7 - tileSize && doors[3].locked == true) tutorialHidden[4] = false;
+            if (px >= tileSize * 2 - tileSize && px <= tileSize * 5 - tileSize && py >= tileSize * 5 - tileSize && py <= tileSize * 8 - tileSize && doors[3].locked == false) tutorialHidden[5] = false;
         }
         else if (level == 5 && px >= tileSize * 6 - tileSize && px <= tileSize * 9 - tileSize && py >= tileSize * 9 - tileSize && py <= tileSize * 12 - tileSize) tutorialHidden[7] = false;
         else if (level == 6 && px >= tileSize * 4 - tileSize && px <= tileSize * 7 - tileSize && py >= tileSize * 4 - tileSize && py <= tileSize * 7 - tileSize) tutorialHidden[8] = false;

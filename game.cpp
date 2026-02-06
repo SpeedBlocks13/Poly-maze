@@ -23,7 +23,7 @@ namespace Tmpl8
     int mapWidth = 6; //how many tiles in width is the map
     int characterSize = 40; //how many pixels is the character
     int characterCenter = characterSize / 2; //defines the chatrzcter center
-    int level = 0; //what level are you on
+    int level = 5; //what level are you on
     int money = 0; //money total
     int moneyGainedInLevel = 0; //money gained in level
     bool mb = false; //is the money counter in level 11 big (for the flashy animation)
@@ -49,9 +49,6 @@ namespace Tmpl8
 
     bool holdingItem = false; // is the player holding an item
     int itemHolding = -1; //what item is the player holding
-
-    int doorAmount = 4; //door amount
-    int itenAmount = 2; //item amount
 
     bool begin = false; //is the level created
     auto startTime = std::chrono::steady_clock::now(); //time started counting
@@ -227,7 +224,7 @@ namespace Tmpl8
 
     void checkItem(int px, int py)
     {
-        for (int i = 0; i < itenAmount; i++)
+        for (int i = 0; i < items.size(); i++)
         {
             if (px + characterCenter >= items[i].x && px + characterCenter <= items[i].x + 64 && py + characterCenter >= items[i].y && py + characterCenter <= items[i].y + 64 && items[i].hidden == false && items[i].used == false)
             {
@@ -302,7 +299,7 @@ namespace Tmpl8
 
     bool checkDoor(int nx, int ny)
     {
-        for (int i = 0; i < doorAmount; i++)
+        for (int i = 0; i < doors.size(); i++)
         {
             if (doors[i].criteria < 5 && doors[i].criteria > 0 && doors[i].criteria != (characterState + 1))
             {
@@ -421,10 +418,6 @@ namespace Tmpl8
                 holdingItem = false;
                 itemHolding = -1;
 
-                
-                doorAmount = 4;
-                itenAmount = 2;
-
                 AddDoorsX({ tileSize * 3 - tileSize, tileSize * 5 - tileSize, tileSize * 7 - tileSize, tileSize * 5 - tileSize });
                 AddDoorsY({ tileSize * 4 - tileSize, tileSize * 2 - tileSize, tileSize * 4 - tileSize, tileSize * 6 - tileSize });
                 AddDoorsCriteria({ 1, 3, 2, 6 });
@@ -464,9 +457,6 @@ namespace Tmpl8
                 itemHolding = -1;
 
                 if (oneLevelSpeedrun == true || fullGameSpeedrun == true) startTime = std::chrono::steady_clock::now();
-
-                doorAmount = 3;
-                itenAmount = 3;
 
                 AddDoorsX({ tileSize * 2 - tileSize, tileSize * 4 - tileSize, tileSize * 6 - tileSize });
                 AddDoorsY({ tileSize * 4 - tileSize, tileSize * 4 - tileSize, tileSize * 6 - tileSize });
@@ -513,9 +503,6 @@ namespace Tmpl8
 
                 if (oneLevelSpeedrun == true) startTime = std::chrono::steady_clock::now();
 
-                doorAmount = 5;
-                itenAmount = 5;
-
                 AddDoorsX({ tileSize * 8 - tileSize, tileSize * 8 - tileSize, tileSize * 8 - tileSize, tileSize * 6 - tileSize, tileSize * 5 - tileSize });
                 AddDoorsY({ tileSize * 3 - tileSize, tileSize * 5 - tileSize, tileSize * 7 - tileSize, tileSize * 5 - tileSize, tileSize * 7 - tileSize });
                 AddDoorsCriteria({ 7, 2, 10, 3, 8 });
@@ -557,9 +544,6 @@ namespace Tmpl8
                 itemHolding = -1;
 
                 if (oneLevelSpeedrun == true) startTime = std::chrono::steady_clock::now();
-
-                doorAmount = 9;
-                itenAmount = 10;
 
                 AddDoorsX({ tileSize * 4 - tileSize, tileSize * 3 - tileSize, tileSize * 5 - tileSize, tileSize * 4 - tileSize, tileSize * 3 - tileSize, tileSize * 4 - tileSize, tileSize * 5 - tileSize, tileSize * 3 - tileSize, tileSize * 4 - tileSize });
                 AddDoorsY({ tileSize * 5 - tileSize, tileSize * 6 - tileSize, tileSize * 6 - tileSize, tileSize * 7 - tileSize, tileSize * 8 - tileSize, tileSize * 9 - tileSize, tileSize * 9 - tileSize, tileSize * 10 - tileSize, tileSize * 11 - tileSize });
@@ -609,9 +593,6 @@ namespace Tmpl8
                 itemHolding = -1;
 
                 if (oneLevelSpeedrun == true) startTime = std::chrono::steady_clock::now();
-
-                doorAmount = 18; //18
-                itenAmount = 8; //8
 
                 AddDoorsX({ tileSize * 3 - tileSize, tileSize * 4 - tileSize, tileSize * 6 - tileSize, tileSize * 7 - tileSize, tileSize * 8 - tileSize, tileSize * 9 - tileSize, tileSize * 10 - tileSize, tileSize * 10 - tileSize, tileSize * 11 - tileSize, tileSize * 12 - tileSize, tileSize * 13 - tileSize, tileSize * 14 - tileSize, tileSize * 16 - tileSize, tileSize * 17 - tileSize, tileSize * 17 - tileSize, tileSize * 19 - tileSize, tileSize * 20 - tileSize, tileSize * 21 - tileSize });
                 AddDoorsY({ tileSize * 11 - tileSize, tileSize * 14 - tileSize, tileSize * 14 - tileSize, tileSize * 11 - tileSize, tileSize * 14 - tileSize, tileSize * 12 - tileSize, tileSize * 8 - tileSize, tileSize * 14 - tileSize, tileSize * 9 - tileSize, tileSize * 16 - tileSize, tileSize * 8 - tileSize, tileSize * 4 - tileSize, tileSize * 7 - tileSize, tileSize * 9 - tileSize, tileSize * 12 - tileSize, tileSize * 6 - tileSize, tileSize * 5 - tileSize, tileSize * 11 - tileSize });
@@ -665,9 +646,6 @@ namespace Tmpl8
                 if (oneLevelSpeedrun == true) startTime = std::chrono::steady_clock::now();
 
                 stickUnlocked = true;
-
-                doorAmount = 9;
-                itenAmount = 27;
 
                 AddDoorsX({ tileSize * 3 - tileSize, tileSize * 3 - tileSize, tileSize * 5 - tileSize, tileSize * 7 - tileSize, tileSize * 7 - tileSize, tileSize * 9 - tileSize, tileSize * 9 - tileSize, tileSize * 9 - tileSize, tileSize * 10 - tileSize });
                 AddDoorsY({ tileSize * 3 - tileSize, tileSize * 17 - tileSize, tileSize * 10 - tileSize, tileSize * 8 - tileSize, tileSize * 12 - tileSize, tileSize * 5 - tileSize, tileSize * 10 - tileSize, tileSize * 15 - tileSize, tileSize * 10 - tileSize });
@@ -725,9 +703,6 @@ namespace Tmpl8
 
                 if (oneLevelSpeedrun == true) startTime = std::chrono::steady_clock::now();
 
-                doorAmount = 10;
-                itenAmount = 8;
-
                 AddDoorsX({ tileSize * 7 - tileSize, tileSize * 7 - tileSize, tileSize * 8 - tileSize, tileSize * 9 - tileSize, tileSize * 10 - tileSize, tileSize * 11 - tileSize, tileSize * 12 - tileSize, tileSize * 13 - tileSize, tileSize * 14 - tileSize, tileSize * 15 - tileSize });
                 AddDoorsY({ tileSize * 5 - tileSize, tileSize * 5 - tileSize, tileSize * 5 - tileSize, tileSize * 5 - tileSize, tileSize * 5 - tileSize, tileSize * 5 - tileSize, tileSize * 5 - tileSize, tileSize * 5 - tileSize, tileSize * 5 - tileSize, tileSize * 5 - tileSize });
                 AddDoorsCriteria({ 4, 6, 10, 3, 1, 9, 8, 7, 2, 5 });
@@ -769,9 +744,6 @@ namespace Tmpl8
                 itemHolding = -1;
 
                 if (oneLevelSpeedrun == true) startTime = std::chrono::steady_clock::now();
-
-                doorAmount = 15;
-                itenAmount = 9;
 
                 AddDoorsX({ tileSize * 4 - tileSize, tileSize * 4 - tileSize, tileSize * 5 - tileSize, tileSize * 7 - tileSize, tileSize * 8 - tileSize, tileSize * 9 - tileSize, tileSize * 9 - tileSize, tileSize * 11 - tileSize, tileSize * 11 - tileSize, tileSize * 13 - tileSize, tileSize * 13 - tileSize, tileSize * 13 - tileSize, tileSize * 17 - tileSize, tileSize * 18 - tileSize, tileSize * 18 - tileSize });
                 AddDoorsY({ tileSize * 4 - tileSize, tileSize * 10 - tileSize, tileSize * 7 - tileSize, tileSize * 7 - tileSize, tileSize * 14 - tileSize, tileSize * 7 - tileSize, tileSize * 12 - tileSize, tileSize * 9 - tileSize, tileSize * 11 - tileSize, tileSize * 7 - tileSize, tileSize * 12 - tileSize, tileSize * 15 - tileSize, tileSize * 7 - tileSize, tileSize * 4 - tileSize, tileSize * 10 - tileSize });
@@ -822,9 +794,6 @@ namespace Tmpl8
                 itemHolding = -1;
 
                 if (oneLevelSpeedrun == true) startTime = std::chrono::steady_clock::now();
-
-                doorAmount = 30;
-                itenAmount = 34;
 
                 AddDoorsX({ tileSize * 5 - tileSize, tileSize * 7 - tileSize, //red
                     tileSize * 4 - tileSize, tileSize * 6 - tileSize, tileSize * 8 - tileSize, //blue
@@ -909,9 +878,6 @@ namespace Tmpl8
 
                 if (oneLevelSpeedrun == true) startTime = std::chrono::steady_clock::now();
 
-                doorAmount = 3;
-                itenAmount = 28;
-
                 AddDoorsX({ tileSize * 24 - tileSize, tileSize * 28 - tileSize, tileSize * 28 - tileSize });
                 AddDoorsY({ tileSize * 17 - tileSize, tileSize * 25 - tileSize, tileSize * 26 - tileSize });
                 AddDoorsCriteria({ 10, 6, 5 });
@@ -979,9 +945,6 @@ namespace Tmpl8
 
                 if (oneLevelSpeedrun == true) startTime = std::chrono::steady_clock::now();
 
-                doorAmount = 0;
-                itenAmount = 5;
-
                 AddItemsX({ tileSize * 27 - tileSize, tileSize * 27 - tileSize, tileSize * 29 - tileSize, tileSize * 29 - tileSize, tileSize * 28 - tileSize });
                 AddItemsY({ tileSize * 2 - tileSize, tileSize * 4 - tileSize, tileSize * 2 - tileSize, tileSize * 4 - tileSize, tileSize * 3 - tileSize });
                 AddItemsFrame({ 0, 0, 0, 0, 1 });
@@ -1012,9 +975,6 @@ namespace Tmpl8
                 fullGameSpeedrun = false;
                 oneLevelSpeedrun = false;
 
-                doorAmount = 0;
-                itenAmount = 0;
-
                 mapHeight = 1;
                 mapWidth = 1;
                 map = { "bax" };
@@ -1030,9 +990,6 @@ namespace Tmpl8
                 speedrunMode = false;
                 fullGameSpeedrun = false;
                 oneLevelSpeedrun = false;
-
-                doorAmount = 0;
-                itenAmount = 0;
 
                 mapHeight = 1;
                 mapWidth = 1;
@@ -1053,7 +1010,7 @@ namespace Tmpl8
 
         if (level == 8)
         {
-            for (int i = 0; i < doorAmount; i++)
+            for (int i = 0; i < doors.size(); i++)
             {
                 if (doors[1].locked == false)
                 {
@@ -1182,7 +1139,7 @@ namespace Tmpl8
             }
 
         //doors creation
-        for (int i = 0; i < doorAmount; i++)
+        for (int i = 0; i < doors.size(); i++)
         {
             //if (doors[i].x + startmidX >= screen->GetWidth() - tileSize || doors[i].x + startmidX < 0 || doors[i].y + startmidY >= screen->GetHeight() - tileSize || doors[i].y + startmidY < 0) continue;
             if (level != 8 || level == 8 && doors[i].hidden == false)
@@ -1192,14 +1149,14 @@ namespace Tmpl8
             }
         }
 
-        /*for (int i = 0; i < doorAmount; i++)
+        /*for (int i = 0; i < doors.size(); i++)
         {
             doorsSprite.SetFrame(doors[i].frame);
             doorsSprite.Draw(screen, doors[i].x - plx + startmidX, dY[i] - ply + startmidY);
         }*/
 
         //item creation
-        for (int i = 0; i < itenAmount; i++)
+        for (int i = 0; i < items.size(); i++)
         {
             if (items[i].pickedUp == false && items[i].used == false && items[i].hidden == false)
             {
@@ -1260,32 +1217,76 @@ namespace Tmpl8
 
         if (level != 11 && level != 12)
         {
-            if (isATransitionPlaying == false)
+            if (characterState != 3)
             {
-                character.SetFrame(characterState);
-                character.Draw(screen, startmidX, startmidY);
-            }
+                if (isATransitionPlaying == false)
+                {
+                    character.SetFrame(characterState);
+                    character.Draw(screen, startmidX, startmidY);
+                }
 
-            int nx = px, ny = py;
-            if (GetAsyncKeyState(VK_LEFT) || GetAsyncKeyState('A')) {
-                nx--;
-                nx--;
+                int nx = px, ny = py;
+                if (GetAsyncKeyState(VK_LEFT) || GetAsyncKeyState('A')) {
+                    nx--;
+                    nx--;
+                }
+                if (GetAsyncKeyState(VK_RIGHT) || GetAsyncKeyState('D')) {
+                    nx++;
+                    nx++;
+                }
+                if (GetAsyncKeyState(VK_UP) || GetAsyncKeyState('W')) {
+                    ny--;
+                    ny--;
+                }
+                if (GetAsyncKeyState(VK_DOWN) || GetAsyncKeyState('S')) {
+                    ny++;
+                    ny++;
+                }
+                if (CheckPos(nx, ny) && CheckPos(nx + 40, ny + 40) && CheckPos(nx + 40, ny) && CheckPos(nx, ny + 40) &&
+                    checkDoor(nx, ny))
+                    px = nx, py = ny;
             }
-            if (GetAsyncKeyState(VK_RIGHT) || GetAsyncKeyState('D')) {
-                nx++;
-                nx++;
+            else if (characterState == 3)
+            {
+                if (isATransitionPlaying == false)
+                {
+                    character.SetFrame(characterState);
+                    character.Draw(screen, startmidX, startmidY);
+                }
+
+                int nx = px, ny = py;
+                if (GetAsyncKeyState(VK_LEFT) || GetAsyncKeyState('A')) {
+                    nx--;
+                    nx--;
+                    nx--;
+                    nx--;
+                    nx--;
+                }
+                if (GetAsyncKeyState(VK_RIGHT) || GetAsyncKeyState('D')) {
+                    nx++;
+                    nx++;
+                    nx++;
+                    nx++;
+                    nx++;
+                }
+                if (GetAsyncKeyState(VK_UP) || GetAsyncKeyState('W')) {
+                    ny--;
+                    ny--;
+                    ny--;
+                    ny--;
+                    ny--;
+                }
+                if (GetAsyncKeyState(VK_DOWN) || GetAsyncKeyState('S')) {
+                    ny++;
+                    ny++;
+                    ny++;
+                    ny++;
+                    ny++;
+                }
+                if (CheckPos(nx, ny) && CheckPos(nx + 40, ny + 40) && CheckPos(nx + 40, ny) && CheckPos(nx, ny + 40) &&
+                    checkDoor(nx, ny))
+                    px = nx, py = ny;
             }
-            if (GetAsyncKeyState(VK_UP) || GetAsyncKeyState('W')) {
-                ny--;
-                ny--;
-            }
-            if (GetAsyncKeyState(VK_DOWN) || GetAsyncKeyState('S')) {
-                ny++;
-                ny++;
-            }
-            if (CheckPos(nx, ny) && CheckPos(nx + 40, ny + 40) && CheckPos(nx + 40, ny) && CheckPos(nx, ny + 40) &&
-                checkDoor(nx, ny))
-                px = nx, py = ny;
         }
 
         tutorialCheck(px, py);

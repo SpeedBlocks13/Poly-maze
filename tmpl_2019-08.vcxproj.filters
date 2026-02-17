@@ -10,7 +10,8 @@
     </ClCompile>
     <ClCompile Include="items.cpp" />
     <ClCompile Include="level creation.cpp" />
-    <ClCompile Include="character.cpp" />
+    <ClCompile Include="doors.cpp" />
+    <ClCompile Include="transformations.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h" />
@@ -22,7 +23,8 @@
     </ClInclude>
     <ClInclude Include="items.h" />
     <ClInclude Include="level creation.h" />
-    <ClInclude Include="character.h" />
+    <ClInclude Include="doors.h" />
+    <ClInclude Include="transformations.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="template code">

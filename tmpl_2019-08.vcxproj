@@ -222,20 +222,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="character.cpp" />
+    <ClCompile Include="doors.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="items.cpp" />
     <ClCompile Include="level creation.cpp" />
     <ClCompile Include="surface.cpp" />
     <ClCompile Include="template.cpp" />
+    <ClCompile Include="transformations.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="character.h" />
+    <ClInclude Include="doors.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="items.h" />
     <ClInclude Include="level creation.h" />
     <ClInclude Include="surface.h" />
     <ClInclude Include="template.h" />
+    <ClInclude Include="transformations.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="_readme.txt" />

@@ -32,7 +32,7 @@ namespace Tmpl8
         bool eIsPressed = false;
 
         //level state
-        int level = 8;
+        int level = 0;
         bool begin = false;
 
         //player state

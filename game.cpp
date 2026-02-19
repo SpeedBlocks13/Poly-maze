@@ -182,9 +182,9 @@ namespace Tmpl8
         if (level == 7)
         {
             if (px + characterCenter >= (8 - 1) * TILE_SIZE &&
-                px + characterCenter <= (9 - 1) * TILE_SIZE &&
-                py + characterCenter >= (14 - 1) * TILE_SIZE &&
-                py + characterCenter <= (15 - 1) * TILE_SIZE)
+                px + characterCenter <= (10 - 1) * TILE_SIZE &&
+                py + characterCenter >= (15 - 1) * TILE_SIZE &&
+                py + characterCenter <= (16 - 1) * TILE_SIZE)
             {
                 levelCreation.map[14] = "aax aax aax aax aax aax aax bd- ce- bcx aa- aa- bb- cd- aax aax aax aax aax aax aax";
             }
@@ -309,12 +309,6 @@ namespace Tmpl8
                     levelCreation.map[14] = "aax aax bc- aa- aa- aa- aa- aa- dc- aax aax aax bc- aa- aa- aa- aa- aa- aa- aa- aa- aa- aa- aa- dc- aax aax ab- aax aax";
                     levelCreation.map[21] = "aax bc- aa- aa- aa- aa- aa- aa- aa- dc- aax aax aax bc- aa- aa- aa- aa- aa- aa- aa- aa- aa- dc- aax aax aax ab- aax aax";
                     for (int j = 16; j <= 33; j++) { levelCreation.items[j].setHidden(true); }
-                    if (levelCreation.doors[20].isLocked()) levelCreation.doors[20].setFrame(36);
-                }
-                if (levelCreation.doors[27].isLocked())
-                {
-                    levelCreation.doors[27].setHidden(true);
-                    levelCreation.map[2] = "aax aax aax aax bc- aa- dc- aax aax aax aax aax ab- aax ab- aax ab- aax ab- aax ab- aax ab- aax ab- aax aax ab- aax aax";
                     if (levelCreation.doors[20].isLocked()) levelCreation.doors[20].setFrame(36);
                 }
             }
@@ -596,7 +590,7 @@ namespace Tmpl8
         if (level == 11) //menu after completing game
         {
             char mC[64];
-            std::snprintf(mC, sizeof(mC), "you have %d out of 84 coins", money);
+            std::snprintf(mC, sizeof(mC), "you have %d out of 85 coins", money);
             screen->PrintScaled(mC, 240, 32, 2, 2, 0xffff00);
 
             screen->PrintScaled("nice job! if you want you can:", 144, 64, 3, 3, 0xffffff);

@@ -1,4 +1,4 @@
-general controls:
+general controls (all also explained in game):
 arrow up or w		moving up
 arrow down or s		moving down
 arrow left or a		moving left

@@ -3,10 +3,7 @@
 namespace Tmpl8
 {
     LevelCreation::LevelCreation()
-        : doors(doorsData)
-        , items(itemsData)
-        , map(mapData)
-        , mapWidth(0)
+        : mapWidth(0)
         , mapHeight(0)
         , playerStartX(0)
         , playerStartY(0)

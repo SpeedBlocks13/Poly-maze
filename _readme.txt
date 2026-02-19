@@ -1,3 +1,19 @@
+general controls (all also explained in game):
+arrow up or w		moving up
+arrow down or s		moving down
+arrow left or a		moving left
+arrow right or d	moving right
+
+e			pick up
+
+
+transformations:
+c	transforms you in to a cube (because c is first letter of cube)
+v	transforms you in to a triangle (because v looks like triangle)
+b	transforms you in to a ball (because b is first letter of ball)
+n	transforms you in to a stick figure once unlocked (because n is the next in row)
+
+
 BRIEF INFO ON THE 2019-08 TEMPLATE
 Template, BUAS version https://www.buas.nl/games
 IGAD/BUAS(NHTV)/UU - Jacco Bikker - 2006-2020

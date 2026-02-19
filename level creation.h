@@ -9,36 +9,38 @@ namespace Tmpl8
     class LevelCreation
     {
     public:
-        std::vector<Door> doors;
-        std::vector<Item> items;
-        std::vector<std::string> map;
+        LevelCreation();
+
+        void createLevel(int level);
+        void clear();
+        bool CheckPos(int x, int y) const;
+        void updateDoors(int characterState);
+        bool checkDoorCollision(int nx, int ny, int charSize) const;
+        bool tryUnlockDoorWithKey(int px, int py, int charSize, int itemFrame);
+        void processDoorStates();
+
+        //read-only access to data
+        const std::vector<Door>& getDoors() const { return doors; }
+        const std::vector<Item>& getItems() const { return items; }
+        const std::vector<std::string>& getMap() const { return map; }
+        int getMapWidth() const { return mapWidth; }
+        int getMapHeight() const { return mapHeight; }
+        int getPlayerStartX() const { return playerStartX; }
+        int getPlayerStartY() const { return playerStartY; }
+
+        //mutable access (for level 8 mechanics and game logic)
+        std::vector<Door>& doors;
+        std::vector<Item>& items;
+        std::vector<std::string>& map;
+
+    private:
+        std::vector<Door> doorsData;
+        std::vector<Item> itemsData;
+        std::vector<std::string> mapData;
         int mapWidth;
         int mapHeight;
         int playerStartX;
         int playerStartY;
-
-        LevelCreation();
-
-        //initialize a specific level
-        void createLevel(int level);
-
-        //clear current level data
-        void clear();
-
-        //check if a position is walkable
-        bool CheckPos(int x, int y) const;
-
-        //update all doors based on character state
-        void updateDoors(int characterState);
-
-        //check if any door blocks movement
-        bool checkDoorCollision(int nx, int ny, int charSize) const;
-
-        //try to unlock a door with a key at player position
-        bool tryUnlockDoorWithKey(int px, int py, int charSize, int itemFrame);
-
-        //process door opening/closing animations
-        void processDoorStates();
     };
 
 } // namespace Tmpl8

@@ -14,7 +14,29 @@
 
 namespace Tmpl8
 {
-    void Game::Init() {}
+    void Game::Init()
+    {
+        //initialize tutorial
+        tutorialX = { (1 - 1) * TILE_SIZE, (1 - 1) * TILE_SIZE,
+                      (4 - 1) * TILE_SIZE, (8 - 1) * TILE_SIZE,
+                      (5 - 1) * TILE_SIZE, (1 - 1) * TILE_SIZE,
+                      ((2 - 1) * TILE_SIZE) / 2, (9 - 1) * TILE_SIZE,
+                      (7 - 1) * TILE_SIZE, (13 - 1) * TILE_SIZE };
+        tutorialY = { (3 - 1) * TILE_SIZE, (4 - 1) * TILE_SIZE,
+                      (1 - 1) * TILE_SIZE, (4 - 1) * TILE_SIZE,
+                      (7 - 1) * TILE_SIZE, (5 - 1) * TILE_SIZE,
+                      (7 - 1) * TILE_SIZE, (9 - 1) * TILE_SIZE,
+                      (4 - 1) * TILE_SIZE, (6 - 1) * TILE_SIZE };
+        tutorialHidden = { true, true, true, true, true, true, true, true, true, true };
+
+        //initialize fastestTime
+        fastestTime = { 9999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999 };
+
+        //initialize player position (characterSize = 40)
+        px = ((2 - 1) * TILE_SIZE) + ((TILE_SIZE - 40) / 2);
+        py = ((2 - 1) * TILE_SIZE) + ((TILE_SIZE - 40) / 2);
+    }
+
     void Game::Shutdown() {}
 
     //tile spritesheet info
@@ -24,28 +46,6 @@ namespace Tmpl8
 
     int characterSize = 40;
     int characterCenter = characterSize / 2; //character center finer based on character size
-    int level = 0; //current level
-    int money = 0; //total money
-    int moneyGainedInLevel = 0;
-    bool stickUnlocked = false; //is the stickman unlocked (unlocks at level 5)
-    int characterState = 0; //0=cube, 1=ball, 2=triangle, 3=stickman
-    bool isATransitionPlaying = false;
-    bool eIsPressed = false;
-    bool finished = false; //have you completed level 10
-
-    //speedrun info
-    bool speedrunMode = false;
-    bool fullGameSpeedrun = false;
-    bool oneLevelSpeedrun = false;
-    std::vector<float> fastestTime = { 9999, 999, 999, 999, 999, 999, 999, 999, 999, 999, 999 };
-    auto startTime = std::chrono::steady_clock::now();
-    auto currentTime = std::chrono::steady_clock::now();
-    auto time = std::chrono::duration<float>(currentTime - startTime).count();
-
-    bool holdingItem = false; //is the player holding an item
-    int itemHolding = -1; //what item is the player holding
-
-    bool begin = false; //is the level created
 
     // Sprites
     Sprite doorsSprite(new Surface("assets/doors.png"), 44);
@@ -54,29 +54,6 @@ namespace Tmpl8
     Sprite tutorialSprite(new Surface("assets/tutorial.png"), 10);
     Sprite thanksForPlaying(new Surface("assets/thanks for playing.png"), 1);
     Sprite lvlbuttons(new Surface("assets/level buttons.png"), 11);
-
-    // Transformation system
-    transformations playerTransformations;
-
-    // LevelCreation instance
-    LevelCreation levelCreation;
-
-    //sets the character in the center of the screen
-    int px = ((2 - 1) * TILE_SIZE) + ((TILE_SIZE - characterSize) / 2);
-    int py = ((2 - 1) * TILE_SIZE) + ((TILE_SIZE - characterSize) / 2);
-
-    //sets all the tutorial baloons at the correct possition
-    std::vector<int> tutorialX = { (1 - 1) * TILE_SIZE, (1 - 1) * TILE_SIZE,
-                                   (4 - 1) * TILE_SIZE, (8 - 1) * TILE_SIZE,
-                                   (5 - 1) * TILE_SIZE, (1 - 1) * TILE_SIZE,
-                                   ((2 - 1) * TILE_SIZE) / 2, (9 - 1) * TILE_SIZE,
-                                   (7 - 1) * TILE_SIZE, (13 - 1) * TILE_SIZE };
-    std::vector<int> tutorialY = { (3 - 1) * TILE_SIZE, (4 - 1) * TILE_SIZE,
-                                   (1 - 1) * TILE_SIZE, (4 - 1) * TILE_SIZE,
-                                   (7 - 1) * TILE_SIZE, (5 - 1) * TILE_SIZE,
-                                   (7 - 1) * TILE_SIZE, (9 - 1) * TILE_SIZE,
-                                   (4 - 1) * TILE_SIZE, (6 - 1) * TILE_SIZE };
-    std::vector<bool> tutorialHidden = { true, true, true, true, true, true, true, true, true, true };
 
     void DrawTile(int tx, int ty, Surface* screen, int x, int y)
     {
@@ -120,7 +97,7 @@ namespace Tmpl8
         }
     }
 
-    void createLevel(Surface* screen, int startmidX, int startmidY, int plx, int ply)
+    void Game::createLevel(Surface* screen, int startmidX, int startmidY, int plx, int ply)
     {
         if (begin == false)
         {
@@ -128,8 +105,8 @@ namespace Tmpl8
             levelCreation.createLevel(level);
 
             //sets players startposition
-            px = levelCreation.playerStartX;
-            py = levelCreation.playerStartY;
+            px = levelCreation.getPlayerStartX();
+            py = levelCreation.getPlayerStartY();
 
             //emptys variables
             character.SetFrame(0);
@@ -148,9 +125,9 @@ namespace Tmpl8
         }
 
         //draws map
-        for (int y = 0; y < levelCreation.mapHeight; y++)
+        for (int y = 0; y < levelCreation.getMapHeight(); y++)
         {
-            for (int x = 0; x < levelCreation.mapWidth; x++)
+            for (int x = 0; x < levelCreation.getMapWidth(); x++)
             {
                 int tx = levelCreation.map[y][x * 4] - 'a';
                 int ty = levelCreation.map[y][x * 4 + 1] - 'a';
@@ -166,20 +143,20 @@ namespace Tmpl8
         //draws doors
         for (const auto& door : levelCreation.doors)
         {
-            if (level != 8 || !door.hidden)
+            if (level != 8 || !door.isHidden())
             {
-                doorsSprite.SetFrame(door.frame);
-                doorsSprite.Draw(screen, door.x - plx + startmidX, door.y - ply + startmidY);
+                doorsSprite.SetFrame(door.getFrame());
+                doorsSprite.Draw(screen, door.getX() - plx + startmidX, door.getY() - ply + startmidY);
             }
         }
 
         //draws items
         for (const auto& item : levelCreation.items)
         {
-            if (!item.pickedUp && !item.used && !item.hidden)
+            if (!item.isPickedUp() && !item.isUsed() && !item.isHidden())
             {
-                itemsSprite.SetFrame(item.frame);
-                itemsSprite.Draw(screen, item.x - plx + startmidX, item.y - ply + startmidY);
+                itemsSprite.SetFrame(item.getFrame());
+                itemsSprite.Draw(screen, item.getX() - plx + startmidX, item.getY() - ply + startmidY);
             }
         }
 
@@ -222,27 +199,27 @@ namespace Tmpl8
         {
             for (int i = 0; i < levelCreation.doors.size(); i++)
             {
-                if (levelCreation.doors[1].locked == false)
+                if (!levelCreation.doors[1].isLocked())
                 {
                     levelCreation.map[12] = "aax aax aax aax abx aax ab- aax aax aax aax aax aax ab- aax ab- aax ab- aax ab- aax ab- aax ab- aax aax aax ab- aax aax";
                     levelCreation.map[13] = "aax aax ad- ac- ac- ac- dg- ac- dd- aax aax aax ad- dg- ac- dg- ac- dg- ac- dg- ac- dg- ac- dg- dd- aax aax ab- aax aax";
                 }
-                if (levelCreation.doors[4].locked == false)
+                if (!levelCreation.doors[4].isLocked())
                 {
                     levelCreation.map[19] = "aax aax aax abx aax abx aax ab- aax aax aax aax aax aax ab- aax ab- aax ab- aax ab- aax ab- aax aax aax aax ab- aax aax";
                     levelCreation.map[20] = "aax ad- ac- ac- ac- ac- ac- dg- ac- dd- aax aax aax ad- dg- ac- dg- ac- dg- ac- dg- ac- dg- dd- aax aax aax ab- aax aax";
                 }
-                if (levelCreation.doors[11].locked == false)
+                if (!levelCreation.doors[11].isLocked())
                 {
                     levelCreation.map[15] = "aax aax bd- bg- cc- bg- cc- bg- cd- aax aax aax bd- cc- cc- cc- cc- cc- bg- cc- cc- cc- cc- cc- cd- aax aax ab- aax aax";
                     levelCreation.map[16] = "aax aax aax ab- aax ab- aax ab- aax aax aax aax aax aax abx aax abx aax ab- aax abx aax abx aax aax aax aax ab- aax aax";
                 }
-                if (levelCreation.doors[15].locked == false)
+                if (!levelCreation.doors[15].isLocked())
                 {
                     levelCreation.map[8] = "aax aax aax bd- bg- cc- bg- cd- aax aax aax bd- cc- cc- cc- bg- cc- cc- cc- cc- cc- cc- cc- cc- cc- cd- aax ab- aax aax";
                     levelCreation.map[9] = "aax aax aax aax ab- aax ab- aax aax aax aax aax aax abx aax ab- aax abx aax abx aax abx aax abx aax aax aax ab- aax aax";
                 }
-                if (levelCreation.doors[20].locked == false)
+                if (!levelCreation.doors[20].isLocked())
                 {
                     levelCreation.map[1] = "aax aax aax aax ad- ac- dd- aax aax ad- bb- bb- dd- aax de- aax de- aax de- aax de- aax de- aax ad- bb- bb- dd- aax aax";
                     levelCreation.map[2] = "aax aax aax aax bc- aa- dc- aax aax ab- aax aax ab- aax ab- aax ab- aax ab- aax ab- aax ab- aax ab- aax aax ab- aax aax";
@@ -255,11 +232,11 @@ namespace Tmpl8
                     levelCreation.map[9] = "aax aax aax aax ab- aax ab- aax aax ab- aax aax aax abx aax ab- aax abx aax abx aax abx aax abx aax aax aax ab- aax aax";
                     levelCreation.map[10] = "aax aax aax aax ab- aax ab- aax aax bc- ac- dd- aax ab- aax ab- aax ab- aax ab- aax ab- aax ab- aax aax aax ab- aax aax";
                     levelCreation.map[11] = "aax aax aax aax ab- aax ab- aax aax bd- cc- cd- aax ab- aax ab- aax ab- aax ab- aax ab- aax ab- aax aax aax ab- aax aax";
-                    for (int j = 16; j <= 33; j++) { levelCreation.items[j].hidden = false; }
+                    for (int j = 16; j <= 33; j++) { levelCreation.items[j].setHidden(false); }
                 }
-                if (levelCreation.doors[27].locked == false)
+                if (!levelCreation.doors[27].isLocked())
                 {
-                    levelCreation.doors[27].hidden = false;
+                    levelCreation.doors[27].setHidden(false);
                     levelCreation.map[1] = "aax aax aax aax ad- ac- dd- aax aax ad- bb- bb- dd- aax de- aax de- aax de- aax de- aax de- aax ad- bb- bb- dd- aax aax";
                     levelCreation.map[2] = "aax aax aax aax bc- aa- cg- bb- bb- dc- aax aax ab- aax ab- aax ab- aax ab- aax ab- aax ab- aax ab- aax aax ab- aax aax";
                     levelCreation.map[3] = "aax aax aax aax bd- bg- cd- aax aax ab- aax aax ab- aax ab- aax ab- aax ab- aax ab- aax ab- aax ab- aax aax ab- aax aax";
@@ -271,33 +248,33 @@ namespace Tmpl8
                     levelCreation.map[9] = "aax aax aax aax ab- aax ab- aax aax ab- aax aax aax abx aax ab- aax abx aax abx aax abx aax abx aax aax aax ab- aax aax";
                     levelCreation.map[10] = "aax aax aax aax ab- aax ab- aax aax bc- ac- dd- aax ab- aax ab- aax ab- aax ab- aax ab- aax ab- aax aax aax ab- aax aax";
                     levelCreation.map[11] = "aax aax aax aax ab- aax ab- aax aax bd- cc- cd- aax ab- aax ab- aax ab- aax ab- aax ab- aax ab- aax aax aax ab- aax aax";
-                    for (int j = 16; j <= 33; j++) { levelCreation.items[j].hidden = false; }
-                    if (levelCreation.doors[20].locked == true) levelCreation.doors[20].frame = 38;
+                    for (int j = 16; j <= 33; j++) { levelCreation.items[j].setHidden(false); }
+                    if (levelCreation.doors[20].isLocked()) levelCreation.doors[20].setFrame(38);
                 }
-                if (levelCreation.doors[28].locked == false)
+                if (!levelCreation.doors[28].isLocked())
                 {
-                    levelCreation.doors[28].hidden = false;
+                    levelCreation.doors[28].setHidden(false);
                     levelCreation.map[14] = "aax aax bc- aa- aa- aa- aa- aa- cg- bb- bb- bb- ag- aa- aa- aa- aa- aa- aa- aa- aa- aa- aa- aa- dc- aax aax ab- aax aax";
                 }
-                else if (levelCreation.doors[28].locked == true)
+                else if (levelCreation.doors[28].isLocked())
                 {
-                    levelCreation.doors[28].hidden = true;
+                    levelCreation.doors[28].setHidden(true);
                     levelCreation.map[14] = "aax aax bc- aa- aa- aa- aa- aa- dc- aax aax aax bc- aa- aa- aa- aa- aa- aa- aa- aa- aa- aa- aa- dc- aax aax ab- aax aax";
                 }
-                if (levelCreation.doors[29].locked == false)
+                if (!levelCreation.doors[29].isLocked())
                 {
-                    levelCreation.doors[29].hidden = false;
+                    levelCreation.doors[29].setHidden(false);
                     levelCreation.map[21] = "aax bc- aa- aa- aa- aa- aa- aa- aa- cg- bb- bb- bb- ag- aa- aa- aa- aa- aa- aa- aa- aa- aa- dc- aax aax aax ab- aax aax";
                 }
-                else if (levelCreation.doors[29].locked == true)
+                else if (levelCreation.doors[29].isLocked())
                 {
-                    levelCreation.doors[29].hidden = true;
+                    levelCreation.doors[29].setHidden(true);
                     levelCreation.map[21] = "aax bc- aa- aa- aa- aa- aa- aa- aa- dc- aax aax aax bc- aa- aa- aa- aa- aa- aa- aa- aa- aa- dc- aax aax aax ab- aax aax";
                 }
-                if (levelCreation.doors[20].locked == true && levelCreation.doors[27].locked == true && levelCreation.doors[28].locked == true && levelCreation.doors[29].locked == true && levelCreation.doors[15].locked == false)
+                if (levelCreation.doors[20].isLocked() && levelCreation.doors[27].isLocked() && levelCreation.doors[28].isLocked() && levelCreation.doors[29].isLocked() && !levelCreation.doors[15].isLocked())
                 {
-                    levelCreation.doors[27].hidden = true; levelCreation.doors[28].hidden = true; levelCreation.doors[29].hidden = true;
-                    levelCreation.doors[27].locked = true; levelCreation.doors[28].locked = true; levelCreation.doors[29].locked = true;
+                    levelCreation.doors[27].setHidden(true); levelCreation.doors[28].setHidden(true); levelCreation.doors[29].setHidden(true);
+                    levelCreation.doors[27].setLocked(true); levelCreation.doors[28].setLocked(true); levelCreation.doors[29].setLocked(true);
                     levelCreation.map[1] = "aax aax aax aax ad- ac- dd- aax aax aax aax aax de- aax de- aax de- aax de- aax de- aax de- aax ad- bb- bb- dd- aax aax";
                     levelCreation.map[2] = "aax aax aax aax bc- aa- dc- aax aax aax aax aax ab- aax ab- aax ab- aax ab- aax ab- aax ab- aax ab- aax aax ab- aax aax";
                     levelCreation.map[3] = "aax aax aax aax bd- bg- cd- aax aax aax aax aax ab- aax ab- aax ab- aax ab- aax ab- aax ab- aax ab- aax aax ab- aax aax";
@@ -311,13 +288,13 @@ namespace Tmpl8
                     levelCreation.map[11] = "aax aax aax aax ab- aax ab- aax aax aax aax aax aax ab- aax ab- aax ab- aax ab- aax ab- aax ab- aax aax aax ab- aax aax";
                     levelCreation.map[14] = "aax aax bc- aa- aa- aa- aa- aa- dc- aax aax aax bc- aa- aa- aa- aa- aa- aa- aa- aa- aa- aa- aa- dc- aax aax ab- aax aax";
                     levelCreation.map[21] = "aax bc- aa- aa- aa- aa- aa- aa- aa- dc- aax aax aax bc- aa- aa- aa- aa- aa- aa- aa- aa- aa- dc- aax aax aax ab- aax aax";
-                    for (int j = 16; j <= 33; j++) { levelCreation.items[j].hidden = true; }
-                    if (levelCreation.doors[20].locked == true) levelCreation.doors[20].frame = 36;
+                    for (int j = 16; j <= 33; j++) { levelCreation.items[j].setHidden(true); }
+                    if (levelCreation.doors[20].isLocked()) levelCreation.doors[20].setFrame(36);
                 }
-                if (levelCreation.doors[20].locked == true && levelCreation.doors[27].locked == true && levelCreation.doors[28].locked == true && levelCreation.doors[29].locked == true && levelCreation.doors[15].locked == true)
+                if (levelCreation.doors[20].isLocked() && levelCreation.doors[27].isLocked() && levelCreation.doors[28].isLocked() && levelCreation.doors[29].isLocked() && levelCreation.doors[15].isLocked())
                 {
-                    levelCreation.doors[27].hidden = true; levelCreation.doors[28].hidden = true; levelCreation.doors[29].hidden = true;
-                    levelCreation.doors[27].locked = true; levelCreation.doors[28].hidden = true; levelCreation.doors[29].hidden = true;
+                    levelCreation.doors[27].setHidden(true); levelCreation.doors[28].setHidden(true); levelCreation.doors[29].setHidden(true);
+                    levelCreation.doors[27].setLocked(true); levelCreation.doors[28].setHidden(true); levelCreation.doors[29].setHidden(true);
                     levelCreation.map[1] = "aax aax aax aax ad- ac- dd- aax aax aax aax aax de- aax de- aax de- aax de- aax de- aax de- aax ad- bb- bb- dd- aax aax";
                     levelCreation.map[2] = "aax aax aax aax bc- aa- dc- aax aax aax aax aax ab- aax ab- aax ab- aax ab- aax ab- aax ab- aax ab- aax aax ab- aax aax";
                     levelCreation.map[3] = "aax aax aax aax bd- bg- cd- aax aax aax aax aax ab- aax ab- aax ab- aax ab- aax ab- aax ab- aax ab- aax aax ab- aax aax";
@@ -331,14 +308,14 @@ namespace Tmpl8
                     levelCreation.map[11] = "aax aax aax aax ab- aax ab- aax aax aax aax aax aax ab- aax ab- aax ab- aax ab- aax ab- aax ab- aax aax aax ab- aax aax";
                     levelCreation.map[14] = "aax aax bc- aa- aa- aa- aa- aa- dc- aax aax aax bc- aa- aa- aa- aa- aa- aa- aa- aa- aa- aa- aa- dc- aax aax ab- aax aax";
                     levelCreation.map[21] = "aax bc- aa- aa- aa- aa- aa- aa- aa- dc- aax aax aax bc- aa- aa- aa- aa- aa- aa- aa- aa- aa- dc- aax aax aax ab- aax aax";
-                    for (int j = 16; j <= 33; j++) { levelCreation.items[j].hidden = true; }
-                    if (levelCreation.doors[20].locked == true) levelCreation.doors[20].frame = 36;
+                    for (int j = 16; j <= 33; j++) { levelCreation.items[j].setHidden(true); }
+                    if (levelCreation.doors[20].isLocked()) levelCreation.doors[20].setFrame(36);
                 }
-                if (levelCreation.doors[27].locked == true)
+                if (levelCreation.doors[27].isLocked())
                 {
-                    levelCreation.doors[27].hidden = true;
+                    levelCreation.doors[27].setHidden(true);
                     levelCreation.map[2] = "aax aax aax aax bc- aa- dc- aax aax aax aax aax ab- aax ab- aax ab- aax ab- aax ab- aax ab- aax ab- aax aax ab- aax aax";
-                    if (levelCreation.doors[20].locked == true) levelCreation.doors[20].frame = 36;
+                    if (levelCreation.doors[20].isLocked()) levelCreation.doors[20].setFrame(36);
                 }
             }
             levelCreation.updateDoors(characterState);
@@ -346,26 +323,26 @@ namespace Tmpl8
         }
     }
 
-    void checkItem(int px, int py)
+    void Game::checkItem(int px, int py)
     {
         for (int i = 0; i < levelCreation.items.size(); i++)
         {
             Item& item = levelCreation.items[i];
 
-            if (px + characterCenter >= item.x &&
-                px + characterCenter <= item.x + 64 &&
-                py + characterCenter >= item.y &&
-                py + characterCenter <= item.y + 64 &&
-                !item.hidden && !item.used)
+            if (px + characterCenter >= item.getX() &&
+                px + characterCenter <= item.getX() + 64 &&
+                py + characterCenter >= item.getY() &&
+                py + characterCenter <= item.getY() + 64 &&
+                !item.isHidden() && !item.isUsed())
             {
                 if (itemHolding != i)
                 {
                     //coins
                     if (item.isCoin())
                     {
-                        item.pickedUp = true;
-                        item.x = -64;
-                        item.y = -64;
+                        item.setPickedUp(true);
+                        item.setX(-64);
+                        item.setY(-64);
                         money++;
                         moneyGainedInLevel++;
                         return;
@@ -375,7 +352,7 @@ namespace Tmpl8
                     {
                         itemHolding = -1;
                         holdingItem = false;
-                        item.used = true;
+                        item.setUsed(true);
                         begin = false;
 
                         if (oneLevelSpeedrun)
@@ -407,7 +384,7 @@ namespace Tmpl8
                     //keys
                     else if (!holdingItem)
                     {
-                        item.pickedUp = true;
+                        item.setPickedUp(true);
                         itemHolding = i;
                         holdingItem = true;
                         return;
@@ -415,11 +392,11 @@ namespace Tmpl8
                     else //swsitch items
                     {
                         int previousItem = itemHolding;
-                        levelCreation.items[previousItem].x = item.x;
-                        levelCreation.items[previousItem].y = item.y;
-                        levelCreation.items[previousItem].pickedUp = false;
+                        levelCreation.items[previousItem].setX(item.getX());
+                        levelCreation.items[previousItem].setY(item.getY());
+                        levelCreation.items[previousItem].setPickedUp(false);
 
-                        item.pickedUp = true;
+                        item.setPickedUp(true);
                         itemHolding = i;
                         holdingItem = true;
                         return;
@@ -431,18 +408,18 @@ namespace Tmpl8
             if (itemHolding == i)
             {
                 int previousItem = itemHolding;
-                levelCreation.items[previousItem].x =
-                    static_cast<int>((px + characterCenter) / TILE_SIZE) * TILE_SIZE;
-                levelCreation.items[previousItem].y =
-                    static_cast<int>((py + characterCenter) / TILE_SIZE) * TILE_SIZE;
-                levelCreation.items[previousItem].pickedUp = false;
+                levelCreation.items[previousItem].setX(
+                    static_cast<int>((px + characterCenter) / TILE_SIZE) * TILE_SIZE);
+                levelCreation.items[previousItem].setY(
+                    static_cast<int>((py + characterCenter) / TILE_SIZE) * TILE_SIZE);
+                levelCreation.items[previousItem].setPickedUp(false);
                 holdingItem = false;
                 itemHolding = -1;
             }
         }
     }
 
-    bool checkDoor(int nx, int ny)
+    bool Game::checkDoor(int nx, int ny)
     {
         //update doors based on character state
         levelCreation.updateDoors(characterState);
@@ -451,9 +428,9 @@ namespace Tmpl8
         if (itemHolding >= 0)
         {
             Item& heldItem = levelCreation.items[itemHolding];
-            if (levelCreation.tryUnlockDoorWithKey(nx, ny, characterSize, heldItem.frame))
+            if (levelCreation.tryUnlockDoorWithKey(nx, ny, characterSize, heldItem.getFrame()))
             {
-                heldItem.used = true;
+                heldItem.setUsed(true);
                 holdingItem = false;
                 itemHolding = -1;
             }
@@ -463,77 +440,77 @@ namespace Tmpl8
         levelCreation.processDoorStates();
 
         //shows diamond on unlock last door in tutorial level
-        if (level == 0 && levelCreation.doors.size() > 3 && !levelCreation.doors[3].locked)
+        if (level == 0 && levelCreation.doors.size() > 3 && !levelCreation.doors[3].isLocked())
         {
             if (levelCreation.items.size() > 1)
-                levelCreation.items[1].hidden = false;
+                levelCreation.items[1].setHidden(false);
         }
 
         //checks door collision
         return levelCreation.checkDoorCollision(nx, ny, characterSize);
     }
 
-    void tutorialCheck(int px, int py)
+    void Game::tutorialCheck()
     {
-        px = px + characterCenter;
-        py = py + characterCenter;
+        int tpx = px + characterCenter;
+        int tpy = py + characterCenter;
 
         for (int i = 0; i < 10; i++)
             tutorialHidden[i] = true;
 
         if (level == 0)
         {
-            if (px >= (3 - 1) * TILE_SIZE && px <= (4 - 1) * TILE_SIZE &&
-                py >= (4 - 1) * TILE_SIZE && py <= (7 - 1) * TILE_SIZE &&
-                levelCreation.doors[3].locked == true)
+            if (tpx >= (3 - 1) * TILE_SIZE && tpx <= (4 - 1) * TILE_SIZE &&
+                tpy >= (4 - 1) * TILE_SIZE && tpy <= (7 - 1) * TILE_SIZE &&
+                levelCreation.doors[3].isLocked())
                 tutorialHidden[0] = false; //movement tutorial
 
-            if (px >= (3 - 1) * TILE_SIZE && px <= (4 - 1) * TILE_SIZE &&
-                py >= (4 - 1) * TILE_SIZE && py <= (7 - 1) * TILE_SIZE &&
-                levelCreation.doors[3].locked == true)
+            if (tpx >= (3 - 1) * TILE_SIZE && tpx <= (4 - 1) * TILE_SIZE &&
+                tpy >= (4 - 1) * TILE_SIZE && tpy <= (7 - 1) * TILE_SIZE &&
+                levelCreation.doors[3].isLocked())
                 tutorialHidden[1] = false; //door1 tutorial
 
-            if (px >= (4 - 1) * TILE_SIZE && px <= (6 - 1) * TILE_SIZE &&
-                py >= (2 - 1) * TILE_SIZE && py <= (3 - 1) * TILE_SIZE &&
-                levelCreation.doors[3].locked == true)
+            if (tpx >= (4 - 1) * TILE_SIZE && tpx <= (6 - 1) * TILE_SIZE &&
+                tpy >= (2 - 1) * TILE_SIZE && tpy <= (3 - 1) * TILE_SIZE &&
+                levelCreation.doors[3].isLocked())
                 tutorialHidden[2] = false; //door2 tutorial
 
-            if (px >= (7 - 1) * TILE_SIZE && px <= (8 - 1) * TILE_SIZE &&
-                py >= (3 - 1) * TILE_SIZE && py <= (5 - 1) * TILE_SIZE &&
-                levelCreation.doors[3].locked == true)
+            if (tpx >= (7 - 1) * TILE_SIZE && tpx <= (8 - 1) * TILE_SIZE &&
+                tpy >= (3 - 1) * TILE_SIZE && tpy <= (5 - 1) * TILE_SIZE &&
+                levelCreation.doors[3].isLocked())
                 tutorialHidden[3] = false; //triangle door tutorial
 
-            if (px >= (5 - 1) * TILE_SIZE && px <= (7 - 1) * TILE_SIZE &&
-                py >= (6 - 1) * TILE_SIZE && py <= (7 - 1) * TILE_SIZE &&
-                levelCreation.doors[3].locked == true)
+            if (tpx >= (5 - 1) * TILE_SIZE && tpx <= (7 - 1) * TILE_SIZE &&
+                tpy >= (6 - 1) * TILE_SIZE && tpy <= (7 - 1) * TILE_SIZE &&
+                levelCreation.doors[3].isLocked())
                 tutorialHidden[4] = false; //ball door tutorial
 
-            if (px >= (2 - 1) * TILE_SIZE && px <= (5 - 1) * TILE_SIZE &&
-                py >= (5 - 1) * TILE_SIZE && py <= (8 - 1) * TILE_SIZE &&
-                levelCreation.doors[3].locked == false)
+            if (tpx >= (2 - 1) * TILE_SIZE && tpx <= (5 - 1) * TILE_SIZE &&
+                tpy >= (5 - 1) * TILE_SIZE && tpy <= (8 - 1) * TILE_SIZE &&
+                !levelCreation.doors[3].isLocked())
                 tutorialHidden[5] = false; //key tutorial
 
-            if (px >= (2 - 1) * TILE_SIZE && px <= (5 - 1) * TILE_SIZE &&
-                py >= (5 - 1) * TILE_SIZE && py <= (8 - 1) * TILE_SIZE &&
-                levelCreation.doors[3].locked == true)
+            if (tpx >= (2 - 1) * TILE_SIZE && tpx <= (5 - 1) * TILE_SIZE &&
+                tpy >= (5 - 1) * TILE_SIZE && tpy <= (8 - 1) * TILE_SIZE &&
+                levelCreation.doors[3].isLocked())
                 tutorialHidden[6] = false; //finish tutorial
         }
-        else if (level == 5 && px >= (6 - 1) * TILE_SIZE &&
-            px <= (9 - 1) * TILE_SIZE &&
-            py >= (9 - 1) * TILE_SIZE &&
-            py <= (12 - 1) * TILE_SIZE)
+        else if (level == 5 && tpx >= (6 - 1) * TILE_SIZE &&
+            tpx <= (9 - 1) * TILE_SIZE &&
+            tpy >= (9 - 1) * TILE_SIZE &&
+            tpy <= (12 - 1) * TILE_SIZE)
             tutorialHidden[7] = false; //stickman unlocked tutorial
 
-        else if (level == 6 && px >= (4 - 1) * TILE_SIZE &&
-            px <= (7 - 1) * TILE_SIZE &&
-            py >= (4 - 1) * TILE_SIZE &&
-            py <= (7 - 1) * TILE_SIZE)
+        else if (level == 6 && tpx >= (4 - 1) * TILE_SIZE &&
+            tpx <= (7 - 1) * TILE_SIZE &&
+            tpy >= (4 - 1) * TILE_SIZE &&
+            tpy <= (7 - 1) * TILE_SIZE)
             tutorialHidden[8] = false; //drop key tutorial
 
-        else if (level == 7 && px >= (10 - 1) * TILE_SIZE &&
-            px <= (13 - 1) * TILE_SIZE &&
-            py >= (6 - 1) * TILE_SIZE &&
-            py <= (9 - 1) * TILE_SIZE)
+        else if (level == 7 && tpx >= (10 - 1) * TILE_SIZE &&
+            tpx <= (13 - 1) * TILE_SIZE &&
+            tpy >= (6 - 1) * TILE_SIZE &&
+            tpy <= (9 - 1) * TILE_SIZE)
             tutorialHidden[9] = false; //reset tutorial
     }
 
@@ -596,7 +573,7 @@ namespace Tmpl8
                 //draws item held by player
                 if (holdingItem && itemHolding >= 0 && itemHolding < levelCreation.items.size())
                 {
-                    itemsSprite.SetFrame(levelCreation.items[itemHolding].frame);
+                    itemsSprite.SetFrame(levelCreation.items[itemHolding].getFrame());
                     itemsSprite.Draw(screen, startmidX, startmidY);
                 }
             }
@@ -614,7 +591,7 @@ namespace Tmpl8
             }
         }
 
-        tutorialCheck(px, py);
+        tutorialCheck();
 
         if (level == 11) //menu after completing game
         {

@@ -2,41 +2,36 @@
 
 namespace Tmpl8
 {
-    enum class ItemType
-    {
-        COIN = 0,       //frame 0
-        DIAMOND = 1,    //frame 1
-        RED_KEY = 2,    //frame 2
-        BLUE_KEY = 3,   //frame 3
-        YELLOW_KEY = 4, //frame 4
-        GREEN_KEY = 5,  //frame 5
-        PURPLE_KEY = 6, //frame 6
-        ORANGE_KEY = 7  //frame 7
-    };
-
     class Item
     {
     public:
+        Item(int x, int y, int frame, bool hidden = false);
+
+        bool isCoin() const { return frame == 0; }
+        bool isDiamond() const { return frame == 1; }
+        bool isKey() const { return frame >= 2 && frame <= 7; }
+
+        //getters
+        int getFrame() const { return frame; }
+        int getX() const { return x; }
+        int getY() const { return y; }
+        bool isPickedUp() const { return pickedUp; }
+        bool isUsed() const { return used; }
+        bool isHidden() const { return hidden; }
+
+        //setters
+        void setPickedUp(bool p) { pickedUp = p; }
+        void setUsed(bool u) { used = u; }
+        void setHidden(bool h) { hidden = h; }
+        void setX(int newX) { x = newX; }
+        void setY(int newY) { y = newY; }
+
+    private:
         int x, y;
         int frame;
         bool pickedUp;
         bool used;
         bool hidden;
-
-        //constructor
-        Item(int x, int y, int frame, bool hidden = false);
-
-        //check if item is a coin
-        bool isCoin() const { return frame == 0; }
-
-        //check if item is the diamond (finish)
-        bool isDiamond() const { return frame == 1; }
-
-        //check if item is a key
-        bool isKey() const { return frame >= 2 && frame <= 7; }
-
-        //get the key type
-        int getKeyValue() const { return frame; }
     };
 
 } // namespace Tmpl8

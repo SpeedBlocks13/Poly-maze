@@ -19,7 +19,6 @@ namespace Tmpl8
         bool tryUnlockDoorWithKey(int px, int py, int charSize, int itemFrame);
         void processDoorStates();
 
-        //public data (game needs direct access for level 8 mechanics)
         std::vector<Door> doors;
         std::vector<Item> items;
         std::vector<std::string> map;

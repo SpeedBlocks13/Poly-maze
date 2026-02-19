@@ -45,9 +45,9 @@ namespace Tmpl8
     int spritesheetSpace = 1;
 
     int characterSize = 40;
-    int characterCenter = characterSize / 2; //character center finer based on character size
+    int characterCenter = characterSize / 2; //character center based on character size
 
-    // Sprites
+    //sprites
     Sprite doorsSprite(new Surface("assets/doors.png"), 44);
     Sprite itemsSprite(new Surface("assets/items.png"), 8);
     Sprite character(new Surface("assets/character sprites.png"), 4);
@@ -383,7 +383,7 @@ namespace Tmpl8
                         holdingItem = true;
                         return;
                     }
-                    else //swsitch items
+                    else //switch items
                     {
                         int previousItem = itemHolding;
                         levelCreation.items[previousItem].setX(item.getX());

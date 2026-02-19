@@ -262,7 +262,7 @@ namespace Tmpl8
             items.push_back(Item((7 - 1) * TILE_SIZE, (15 - 1) * TILE_SIZE, 7, false));
             items.push_back(Item((11 - 1) * TILE_SIZE, (5 - 1) * TILE_SIZE, 2, false));
             items.push_back(Item((11 - 1) * TILE_SIZE, (15 - 1) * TILE_SIZE, 4, false));
-            // Coins
+            //coins
             items.push_back(Item((2 - 1) * TILE_SIZE, (4 - 1) * TILE_SIZE, 0, false));
             items.push_back(Item((2 - 1) * TILE_SIZE, (6 - 1) * TILE_SIZE, 0, false));
             items.push_back(Item((2 - 1) * TILE_SIZE, (9 - 1) * TILE_SIZE, 0, false));
@@ -283,7 +283,7 @@ namespace Tmpl8
             items.push_back(Item((12 - 1) * TILE_SIZE, (6 - 1) * TILE_SIZE, 0, false));
             items.push_back(Item((12 - 1) * TILE_SIZE, (14 - 1) * TILE_SIZE, 0, false));
             items.push_back(Item((12 - 1) * TILE_SIZE, (16 - 1) * TILE_SIZE, 0, false));
-            // Diamond
+            //diamond
             items.push_back(Item((12 - 1) * TILE_SIZE, (10 - 1) * TILE_SIZE, 1, false));
         }
 
@@ -421,7 +421,7 @@ namespace Tmpl8
                 "aax aax aax aax aax aax aax aax aax aax aax aax aax aax aax aax aax aax aax aax aax aax aax aax aax aax aax aax aax aax"
             };
 
-            // Regular doors (visible)
+            //visable doors
             doors.push_back(Door((5 - 1) * TILE_SIZE, (10 - 1) * TILE_SIZE, 5, true, 22));
             doors.push_back(Door((7 - 1) * TILE_SIZE, (10 - 1) * TILE_SIZE, 5, true, 22));
             doors.push_back(Door((4 - 1) * TILE_SIZE, (17 - 1) * TILE_SIZE, 6, true, 26));
@@ -449,19 +449,19 @@ namespace Tmpl8
             doors.push_back(Door((21 - 1) * TILE_SIZE, (6 - 1) * TILE_SIZE, 9, true, 36));
             doors.push_back(Door((23 - 1) * TILE_SIZE, (6 - 1) * TILE_SIZE, 9, true, 36));
             doors.push_back(Door((25 - 1) * TILE_SIZE, (6 - 1) * TILE_SIZE, 9, true, 36));
-            // Hidden doors (special mechanics)
+            //hidden doors
             doors.push_back(Door((8 - 1) * TILE_SIZE, (3 - 1) * TILE_SIZE, 4, true, 17, true));
             doors.push_back(Door((10 - 1) * TILE_SIZE, (15 - 1) * TILE_SIZE, 2, true, 9, true));
             doors.push_back(Door((11 - 1) * TILE_SIZE, (22 - 1) * TILE_SIZE, 3, true, 13, true));
 
-            // Keys
+            //keys
             items.push_back(Item((6 - 1) * TILE_SIZE, (8 - 1) * TILE_SIZE, 2, false));
             items.push_back(Item((6 - 1) * TILE_SIZE, (15 - 1) * TILE_SIZE, 3, false));
             items.push_back(Item((6 - 1) * TILE_SIZE, (22 - 1) * TILE_SIZE, 5, false));
             items.push_back(Item((19 - 1) * TILE_SIZE, (8 - 1) * TILE_SIZE, 6, false));
             items.push_back(Item((19 - 1) * TILE_SIZE, (15 - 1) * TILE_SIZE, 7, false));
             items.push_back(Item((19 - 1) * TILE_SIZE, (22 - 1) * TILE_SIZE, 4, false));
-            // Coins (visible)
+            //visable coins
             items.push_back(Item((5 - 1) * TILE_SIZE, (29 - 1) * TILE_SIZE, 0, false));
             items.push_back(Item((11 - 1) * TILE_SIZE, (29 - 1) * TILE_SIZE, 0, false));
             items.push_back(Item((16 - 1) * TILE_SIZE, (29 - 1) * TILE_SIZE, 0, false));
@@ -471,9 +471,9 @@ namespace Tmpl8
             items.push_back(Item((28 - 1) * TILE_SIZE, (11 - 1) * TILE_SIZE, 0, false));
             items.push_back(Item((28 - 1) * TILE_SIZE, (15 - 1) * TILE_SIZE, 0, false));
             items.push_back(Item((28 - 1) * TILE_SIZE, (20 - 1) * TILE_SIZE, 0, false));
-            // Diamond
+            //diamond
             items.push_back(Item((28 - 1) * TILE_SIZE, (27 - 1) * TILE_SIZE, 1, false));
-            // Hidden items (secret area)
+            //hidden items
             items.push_back(Item((12 - 1) * TILE_SIZE, (12 - 1) * TILE_SIZE, 0, true));
             items.push_back(Item((13 - 1) * TILE_SIZE, (2 - 1) * TILE_SIZE, 0, true));
             items.push_back(Item((10 - 1) * TILE_SIZE, (2 - 1) * TILE_SIZE, 0, true));
@@ -538,11 +538,11 @@ namespace Tmpl8
             doors.push_back(Door((28 - 1) * TILE_SIZE, (25 - 1) * TILE_SIZE, 6, true, 26));
             doors.push_back(Door((28 - 1) * TILE_SIZE, (26 - 1) * TILE_SIZE, 5, true, 22));
 
-            // Keys
+            //keys
             items.push_back(Item((14 - 1) * TILE_SIZE, (25 - 1) * TILE_SIZE, 3, false));
             items.push_back(Item((27 - 1) * TILE_SIZE, (10 - 1) * TILE_SIZE, 7, false));
             items.push_back(Item((29 - 1) * TILE_SIZE, (6 - 1) * TILE_SIZE, 2, false));
-            // Coins
+            //coins
             items.push_back(Item((22 - 1) * TILE_SIZE, (13 - 1) * TILE_SIZE, 0, false));
             items.push_back(Item((22 - 1) * TILE_SIZE, (14 - 1) * TILE_SIZE, 0, false));
             items.push_back(Item((22 - 1) * TILE_SIZE, (15 - 1) * TILE_SIZE, 0, false));
@@ -567,7 +567,7 @@ namespace Tmpl8
             items.push_back(Item((27 - 1) * TILE_SIZE, (14 - 1) * TILE_SIZE, 0, false));
             items.push_back(Item((27 - 1) * TILE_SIZE, (15 - 1) * TILE_SIZE, 0, false));
             items.push_back(Item((27 - 1) * TILE_SIZE, (16 - 1) * TILE_SIZE, 0, false));
-            // Diamond
+            //diamond
             items.push_back(Item((28 - 1) * TILE_SIZE, (28 - 1) * TILE_SIZE, 1, false));
         }
 
@@ -585,8 +585,6 @@ namespace Tmpl8
                 "aax bd- cc- cd- aax bd- cc- cc- cc- cc- cc- cc- cc- cc- cc- cc- cc- cc- cc- cc- cc- cc- cc- cc- cd- aax bd- cc- cd- aax",
                 "aax aax aax aax aax aax aax aax aax aax aax aax aax aax aax aax aax aax aax aax aax aax aax aax aax aax aax aax aax aax"
             };
-
-            // No doors in this level
 
             items.push_back(Item((27 - 1) * TILE_SIZE, (2 - 1) * TILE_SIZE, 0, false));
             items.push_back(Item((27 - 1) * TILE_SIZE, (4 - 1) * TILE_SIZE, 0, false));
@@ -620,9 +618,9 @@ namespace Tmpl8
         for (const auto& door : doors)
         {
             if (door.blocksMovement(nx, ny, charSize))
-                return false; // Door blocks movement
+                return false; //door blocks movement
         }
-        return true; // No doors blocking
+        return true;
     }
 
     bool LevelCreation::tryUnlockDoorWithKey(int px, int py, int charSize, int itemFrame)
@@ -638,11 +636,11 @@ namespace Tmpl8
             {
                 if (door.tryUnlockWithKey(itemFrame))
                 {
-                    return true; //key was consumed
+                    return true; //key was used
                 }
             }
         }
-        return false; //key not used
+        return false;
     }
 
     void LevelCreation::processDoorStates()
